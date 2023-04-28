@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="bottom_nav_item_color">#000000</color>
+    <color name="border_color">#000000</color>
+    <color name="instock_color">#27AE60</color>
+    <color name="overpriced_color">#F1C40F</color>
+    <color name="oos_color">#C0392B</color>
+    <color name="displayerror_color">#9B59B6</color>
+</resources>

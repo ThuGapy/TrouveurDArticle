@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:theme="@style/ToolBarTheme"
+        android:popupTheme="@style/ToolBarPopupTheme"
+        android:padding="10dp"
+        android:paddingBottom="30dp">
+
+        <ImageButton
+            android:id="@+id/settings_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/settings"
+            android:src="@drawable/baseline_settings_24"
+            android:layout_marginRight="24dp"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            app:tint="@android:color/white" />
+
+
+    </androidx.appcompat.widget.Toolbar>
+
+</LinearLayout>

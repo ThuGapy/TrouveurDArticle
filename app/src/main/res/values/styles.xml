@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <style name="NoActionBarTheme" parent="Theme.AppCompat.Light.NoActionBar"></style>
+    <style name="RegularTheme" parent="Theme.AppCompat.Light.DarkActionBar"></style>
+    <style name="ToolBarTheme" parent="android:Theme.Material.Dialog"></style>
+    <style name="ToolBarPopupTheme" parent="android:Theme.Material.Dialog.Alert"></style>
+
+</resources>
