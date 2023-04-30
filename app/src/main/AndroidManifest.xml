@@ -2,8 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
 
+    <permission
+        android:name="net.info420.trouveurarticle.permissions.OPTION_PERMISSION"
+        android:protectionLevel="dangerous"
+        android:label="@string/custom_permission_description" />
+
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="net.info420.trouveurarticle.permissions.OPTION_PERMISSION" />
 
     <application
         android:allowBackup="true"
@@ -18,7 +23,8 @@
         <activity
             android:name=".Settings"
             android:theme="@style/RegularTheme"
-            android:exported="false" />
+            android:exported="false"
+            android:permission="net.info420.trouveurarticle.permissions.OPTION_PERMISSION"/>
 
         <activity
             android:name=".MainActivity"

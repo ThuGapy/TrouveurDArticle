@@ -13,8 +13,10 @@ import android.widget.ListView;
 
 import net.info420.trouveurarticle.database.DatabaseHelper;
 import net.info420.trouveurarticle.database.FollowedItemAdapter;
+import net.info420.trouveurarticle.views.OnRefreshRequestedListener;
+import net.info420.trouveurarticle.views.OnTriggerEditListener;
 
-public class FollowedProductsView extends Fragment {
+public class FollowedProductsView extends Fragment implements OnRefreshRequestedListener {
     private View fragmentView;
     private DatabaseHelper dbHelper;
     private Cursor dataCursor;
@@ -45,7 +47,7 @@ public class FollowedProductsView extends Fragment {
 
     public void Refresh() {
         dataCursor = dbHelper.getAllItemsStockStatus();
-        itemAdapter = new FollowedItemAdapter(getActivity(), null, 0);
+        itemAdapter = new FollowedItemAdapter(getActivity(), (OnTriggerEditListener) getActivity(), (OnRefreshRequestedListener) this);
         itemAdapter.changeCursor(dataCursor);
         ListView itemView = fragmentView.findViewById(R.id.item_listview);
         itemView.setAdapter(itemAdapter);
@@ -58,5 +60,10 @@ public class FollowedProductsView extends Fragment {
         if (itemAdapter != null) {
             itemAdapter.changeCursor(null);
         }
+    }
+
+    @Override
+    public void RequestRefresh() {
+        Refresh();
     }
 }

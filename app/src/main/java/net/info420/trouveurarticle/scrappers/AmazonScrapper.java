@@ -13,7 +13,7 @@ public class AmazonScrapper extends Scrapper{
         if(link == null || link.equals("")) return null;
         int dpIndex = link.indexOf("dp/");
         int nextSlash = link.substring(dpIndex + 3).indexOf("/");
-        return link.substring(0, dpIndex + nextSlash + 3);
+        return link.substring(0, dpIndex + nextSlash + 3) + "/";
     }
 
     @Override

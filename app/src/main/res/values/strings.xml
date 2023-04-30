@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Trouveur Article</string>
     <string name="settings">Paramètres</string>
+    <string name="custom_permission_description">Accès aux options de l\'application</string>
 </resources>

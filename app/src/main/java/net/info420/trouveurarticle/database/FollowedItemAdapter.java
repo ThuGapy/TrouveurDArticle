@@ -19,11 +19,15 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import net.info420.trouveurarticle.R;
+import net.info420.trouveurarticle.views.OnRefreshRequestedListener;
+import net.info420.trouveurarticle.views.OnTriggerEditListener;
 
 public class FollowedItemAdapter extends CursorAdapter {
     private Context applicationContext;
     private DatabaseHelper dbHelper;
     private ListView adapterListView;
+    private OnTriggerEditListener activityEditListener;
+    private OnRefreshRequestedListener fragmentRefreshListener;
     private enum PRICE_STATUS {
         GOOD,
         OVERPRICED,
@@ -31,8 +35,10 @@ public class FollowedItemAdapter extends CursorAdapter {
         NO_DATA
     }
 
-    public FollowedItemAdapter(Context context, Cursor cursor, int flags) {
-        super(context, cursor, flags);
+    public FollowedItemAdapter(Context context, OnTriggerEditListener editListener, OnRefreshRequestedListener refreshListener) {
+        super(context, null, 0);
+        activityEditListener = editListener;
+        fragmentRefreshListener = refreshListener;
     }
 
     @Override
@@ -68,7 +74,7 @@ public class FollowedItemAdapter extends CursorAdapter {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                activityEditListener.TriggerEdit(elementID);
             }
         });
 
@@ -87,7 +93,7 @@ public class FollowedItemAdapter extends CursorAdapter {
                         dbHelper.deleteItem(elementID);
                         dbHelper.close();
 
-                        RefreshListView();
+                        fragmentRefreshListener.RequestRefresh();
                     }
                 });
 
@@ -158,13 +164,5 @@ public class FollowedItemAdapter extends CursorAdapter {
                 break;
         }
 
-    }
-
-    public void RefreshListView() {
-        dbHelper = new DatabaseHelper(applicationContext);
-        Cursor dataCursor = dbHelper.getAllItemsStockStatus();
-        this.changeCursor(dataCursor);
-        adapterListView.setAdapter(this);
-        dbHelper.close();
     }
 }

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import net.info420.trouveurarticle.database.AppSettings;
@@ -25,6 +26,9 @@ import net.info420.trouveurarticle.scrappers.NeweggScrapper;
 import net.info420.trouveurarticle.scrappers.Scrapper;
 import net.info420.trouveurarticle.scrappers.StoreFront;
 import net.info420.trouveurarticle.views.AddProductButtonGroup;
+import net.info420.trouveurarticle.views.OnTriggerEditListener;
+
+import org.w3c.dom.Text;
 
 public class AddProductView extends Fragment {
     private View fragmentView;
@@ -38,10 +42,10 @@ public class AddProductView extends Fragment {
     private boolean editMode;
 
     public AddProductView() { }
-    public AddProductView(int editID, boolean editMode) {
+    public AddProductView(int toEditID) {
         Bundle args = new Bundle();
-        args.putInt("edit_id", editID);
-        args.putBoolean("edit_mode", editMode);
+        args.putInt("edit_id", toEditID);
+        args.putBoolean("edit_mode", true);
         this.setArguments(args);
     }
     @Override
@@ -73,6 +77,8 @@ public class AddProductView extends Fragment {
         Button clearButton = fragmentView.findViewById(R.id.clear_button);
         Button modifyButton = fragmentView.findViewById(R.id.save_changes_button);
 
+        TextView addProductTextView = fragmentView.findViewById(R.id.add_product_text_view);
+
         EditText productName = fragmentView.findViewById(R.id.product_name_edit);
 
         amazonButtonGroup = fragmentView.findViewById(R.id.amazon_button_group);
@@ -92,11 +98,74 @@ public class AddProductView extends Fragment {
         if(editMode) {
             Cursor cursor = dbHelper.getItem(editId);
 
+            addProductTextView.setText("Modification d'un produit");
             addButton.setVisibility(View.GONE);
             clearButton.setVisibility(View.GONE);
             modifyButton.setVisibility(View.VISIBLE);
 
             productName.setText(cursor.getString(cursor.getColumnIndexOrThrow("nomArticle")));
+            amazonButtonGroup.getEditText().setText(cursor.getString(cursor.getColumnIndexOrThrow("amazon")));
+            neweggButtonGroup.getEditText().setText(cursor.getString(cursor.getColumnIndexOrThrow("newegg")));
+            canadaComputersButtonGroup.getEditText().setText(cursor.getString(cursor.getColumnIndexOrThrow("canadacomputers")));
+            memoryExpressButtonGroup.getEditText().setText(cursor.getString(cursor.getColumnIndexOrThrow("memoryexpress")));
+            productPrice.setText(String.valueOf(cursor.getDouble(cursor.getColumnIndexOrThrow("prix"))));
+
+            modifyButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String productNameString = String.valueOf(productName.getText());
+                            String amazonLink = String.valueOf(amazonButtonGroup.getEditText().getText());
+                            String neweggLink = String.valueOf(neweggButtonGroup.getEditText().getText());
+                            String canadacomputersLink = String.valueOf(canadaComputersButtonGroup.getEditText().getText());
+                            String memoryExpressLink = String.valueOf(memoryExpressButtonGroup.getEditText().getText());
+
+                            System.out.println("amazonlink: " + amazonLink);
+                            double wantedPrice = 0;
+                            try {
+                                wantedPrice = Double.parseDouble(String.valueOf(productPrice.getText()));
+                            } catch(NumberFormatException ex) {}
+
+                            String fetchedString = null;
+                            String productName = productNameString;
+
+                            if(preferences.getAutomaticallyReplaceProductName()) {
+                                Scrapper productNameScrapper;
+                                if(!amazonLink.equals("")) {
+                                    productNameScrapper = new AmazonScrapper();
+                                    fetchedString = productNameScrapper.FetchProductName(amazonLink);
+                                } else if(!neweggLink.equals("")) {
+                                    productNameScrapper = new NeweggScrapper();
+                                    fetchedString = productNameScrapper.FetchProductName(neweggLink);
+                                } else if(!canadacomputersLink.equals("")) {
+                                    productNameScrapper = new CanadaComputersScrapper();
+                                    fetchedString = productNameScrapper.FetchProductName(canadacomputersLink);
+                                } else if(!memoryExpressLink.equals("")) {
+                                    productNameScrapper = new MemoryExpressScrapper();
+                                    fetchedString = productNameScrapper.FetchProductName(memoryExpressLink);
+                                }
+                            }
+
+                            if(!productNameString.equals("") && wantedPrice != 0 && (!amazonLink.equals("") || !neweggLink.equals("") || !canadacomputersLink.equals("") || !memoryExpressLink.equals(""))) {
+                                String stringToAdd = productNameString;
+                                if(preferences.getAutomaticallyReplaceProductName() && (!fetchedString.equals("") && fetchedString != null)) {
+                                    stringToAdd = fetchedString;
+                                }
+
+                                dbHelper.updateItem(editId, stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
+                                ShowToast("Produit modifié");
+
+                                OnTriggerEditListener listener = (OnTriggerEditListener) getActivity();
+                                listener.EditDone();
+                            } else {
+                                ShowToast("Impossible de modifier le produit");
+                            }
+                        }
+                    }).start();
+                }
+            });
         }
 
         clearButton.setOnClickListener(new View.OnClickListener() {
@@ -118,9 +187,9 @@ public class AddProductView extends Fragment {
                         String neweggLink = String.valueOf(neweggButtonGroup.getEditText().getText());
                         String canadacomputersLink = String.valueOf(canadaComputersButtonGroup.getEditText().getText());
                         String memoryExpressLink = String.valueOf(memoryExpressButtonGroup.getEditText().getText());
-                        double msrp = 0;
+                        double wantedPrice = 0;
                         try {
-                            msrp = Double.parseDouble(String.valueOf(productPrice.getText()));
+                            wantedPrice = Double.parseDouble(String.valueOf(productPrice.getText()));
                         } catch(NumberFormatException ex) {}
 
                         String fetchedString = null;
@@ -143,27 +212,16 @@ public class AddProductView extends Fragment {
                             }
                         }
 
-                        if(!productNameString.equals("") && msrp != 0 && (!amazonLink.equals("") || !neweggLink.equals("") || !canadacomputersLink.equals("") || !memoryExpressLink.equals(""))) {
+                        if(!productNameString.equals("") && wantedPrice != 0 && (!amazonLink.equals("") || !neweggLink.equals("") || !canadacomputersLink.equals("") || !memoryExpressLink.equals(""))) {
                             String stringToAdd = productNameString;
                             if(preferences.getAutomaticallyReplaceProductName() && (!fetchedString.equals("") && fetchedString != null)) {
                                 stringToAdd = fetchedString;
                             }
 
-                            dbHelper.createNewItem(stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, msrp);
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getContext(), "Objet ajouté", Toast.LENGTH_LONG).show();
-                                    ClearInputs();
-                                }
-                            });
+                            dbHelper.createNewItem(stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
+                            ShowToast("Produit ajouté");
                         } else {
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getContext(), "Impossible d'ajouter l'objet", Toast.LENGTH_LONG).show();
-                                }
-                            });
+                            ShowToast("Impossible de modifier le produit");
                         }
                     }
                 }).start();
@@ -190,5 +248,14 @@ public class AddProductView extends Fragment {
     public void ClearPriceTextBox() {
         EditText textbox = fragmentView.findViewById(R.id.price_textbox);
         textbox.setText("");
+    }
+
+    public void ShowToast(String text) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
