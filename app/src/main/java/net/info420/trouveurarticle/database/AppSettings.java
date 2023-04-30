@@ -87,6 +87,6 @@ public class AppSettings {
         sharedPreferences.edit().putInt(PREF_REFRESH_TIME_CELL_PLUGGING_IN, DefaultRefreshTimeCellPluggedIn).apply();
         sharedPreferences.edit().putBoolean(PREF_DISABLE_REFRESH_CELL_DATA, DefaultDisableRefreshCellData).apply();
         sharedPreferences.edit().putBoolean(PREF_DISABLE_REFRESH_BATTERY_LOW, DefaultDisableRefreshBatteryLow).apply();
-        sharedPreferences.edit().putBoolean(PREF_AUTOMATICALLY_REPLACE_PRODUCT_NAME, DefaultAutomaticallyReplaceProductName);
+        sharedPreferences.edit().putBoolean(PREF_AUTOMATICALLY_REPLACE_PRODUCT_NAME, DefaultAutomaticallyReplaceProductName).apply();
     }
 }

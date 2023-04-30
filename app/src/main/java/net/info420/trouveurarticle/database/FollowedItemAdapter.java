@@ -55,12 +55,16 @@ public class FollowedItemAdapter extends CursorAdapter {
         int idIndex = cursor.getColumnIndexOrThrow("_id");
         int nomArticleIndex = cursor.getColumnIndexOrThrow("nomArticle");
         int prixIndex = cursor.getColumnIndexOrThrow("prix");
+        int amazonLinkIndex = cursor.getColumnIndexOrThrow("amazon_link");
         int amazonStockIndex = cursor.getColumnIndexOrThrow("amazon_stock");
         int amazonPriceIndex = cursor.getColumnIndexOrThrow("amazon_price");
+        int neweggLinkIndex = cursor.getColumnIndexOrThrow("newegg_link");
         int neweggStockIndex = cursor.getColumnIndexOrThrow("newegg_stock");
         int neweggPriceIndex = cursor.getColumnIndexOrThrow("newegg_price");
+        int canadaComputersLinkIndex = cursor.getColumnIndexOrThrow("canadacomputers_link");
         int canadaComputersStockIndex = cursor.getColumnIndexOrThrow("canadacomputers_stock");
         int canadaComputersPriceIndex = cursor.getColumnIndexOrThrow("canadacomputers_price");
+        int memoryExpressLinkIndex = cursor.getColumnIndexOrThrow("memoryexpress_link");
         int memoryExpressStockIndex = cursor.getColumnIndexOrThrow("memoryexpress_stock");
         int memoryExpressPriceIndex = cursor.getColumnIndexOrThrow("memoryexpress_price");
 
@@ -109,34 +113,54 @@ public class FollowedItemAdapter extends CursorAdapter {
             }
         });
 
+        ImageButton seeButton = view.findViewById(R.id.see_button);
+
         PRICE_STATUS status = PRICE_STATUS.NO_DATA;
         boolean inStock = false;
         double price = 0;
+        String lowestPriceLink = "";
 
         if(cursor.getInt(amazonStockIndex) == 1) {
             inStock = true;
             price = cursor.getDouble(amazonPriceIndex);
+            lowestPriceLink = cursor.getString(amazonLinkIndex);
         }
         if(cursor.getInt(neweggStockIndex) == 1) {
             inStock = true;
             if(cursor.getDouble(neweggPriceIndex) < price) {
                 price = cursor.getDouble(amazonPriceIndex);
+                lowestPriceLink = cursor.getString(neweggLinkIndex);
             }
         }
         if(cursor.getInt(canadaComputersStockIndex) == 1) {
             inStock = true;
             if(cursor.getDouble(canadaComputersPriceIndex) < price) {
                 price = cursor.getDouble(canadaComputersPriceIndex);
+                lowestPriceLink = cursor.getString(canadaComputersLinkIndex);
             }
         }
         if(cursor.getInt(memoryExpressStockIndex) == 1) {
             inStock = true;
             if(cursor.getFloat(memoryExpressPriceIndex) < price) {
                 price = cursor.getDouble(memoryExpressPriceIndex);
+                lowestPriceLink = cursor.getString(memoryExpressLinkIndex);
             }
         }
 
+        String seeLink = lowestPriceLink;
+        seeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activityEditListener.OpenLink(seeLink);
+            }
+        });
+
         float targetPrice = cursor.getFloat(prixIndex);
+
+        System.out.println(inStock);
+        System.out.println(price);
+        System.out.println(targetPrice);
+
         if(inStock && price <= targetPrice) {
             status = PRICE_STATUS.GOOD;
         } else if(inStock && price > targetPrice) {
@@ -146,6 +170,8 @@ public class FollowedItemAdapter extends CursorAdapter {
         } else {
             status = PRICE_STATUS.OOS;
         }
+
+        System.out.println(status);
 
         itemName.setText(cursor.getString(nomArticleIndex));
 

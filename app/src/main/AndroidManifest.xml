@@ -8,6 +8,7 @@
         android:label="@string/custom_permission_description" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="net.info420.trouveurarticle.permissions.OPTION_PERMISSION" />
 
     <application
@@ -22,7 +23,7 @@
         tools:targetApi="31" >
         <activity
             android:name=".Settings"
-            android:theme="@style/RegularTheme"
+            android:theme="@style/NoActionBarTheme"
             android:exported="false"
             android:permission="net.info420.trouveurarticle.permissions.OPTION_PERMISSION"/>
 
@@ -36,6 +37,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".scrappers.ScrappingService" />
     </application>
 
 </manifest>

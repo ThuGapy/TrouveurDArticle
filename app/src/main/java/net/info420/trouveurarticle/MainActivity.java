@@ -8,7 +8,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -17,6 +19,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -27,6 +30,7 @@ import net.info420.trouveurarticle.scrappers.CanadaComputersScrapper;
 import net.info420.trouveurarticle.scrappers.MemoryExpressScrapper;
 import net.info420.trouveurarticle.scrappers.NeweggScrapper;
 import net.info420.trouveurarticle.scrappers.ScrapperResult;
+import net.info420.trouveurarticle.scrappers.ScrappingService;
 import net.info420.trouveurarticle.views.OnTriggerEditListener;
 
 public class MainActivity extends AppCompatActivity implements OnTriggerEditListener {
@@ -45,9 +49,10 @@ public class MainActivity extends AppCompatActivity implements OnTriggerEditList
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        toolbar.setTitle("Trouveur d'article");
-        toolbar.setSubtitle("Trouvez les articles en demande!");
-        toolbar.setTitleTextColor(Color.WHITE);
+        TextView toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
+        toolbarTitle.setText("Trouveur d'articles");
+        TextView toolbarSubtitle = toolbar.findViewById(R.id.toolbar_subtitle);
+        toolbarSubtitle.setText("Trouvez les articles en demande!");
 
         ImageButton settingsButton = findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(new View.OnClickListener() {
@@ -85,20 +90,11 @@ public class MainActivity extends AppCompatActivity implements OnTriggerEditList
         });
 
         ValiderPermissions();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                /*AmazonScrapper scrapper = new AmazonScrapper();
-                String result = scrapper.FetchProductName("https://www.amazon.ca/Samsung-980-PRO-SSD-technologie/dp/B08RK2SR23");*/
-                /*NeweggScrapper scrapper = new NeweggScrapper();
-                String result = scrapper.FetchProductName("https://www.newegg.ca/msi-geforce-rtx-4090-rtx-4090-gaming-x-trio-24g/p/N82E16814137761?Description=rtx%204090&cm_re=rtx_4090-_-14-137-761-_-Product");*/
-                /*CanadaComputersScrapper scrapper = new CanadaComputersScrapper();
-                String result = scrapper.FetchProductName("https://www.canadacomputers.com/product_info.php?cPath=43_557_559&item_id=226645");*/
-                MemoryExpressScrapper scrapper = new MemoryExpressScrapper();
-                String result = scrapper.FetchProductName("https://www.memoryexpress.com/Products/MX00122931");
-                System.out.println(result);
-            }
-        }).start();
+
+        if(!IsScrappingServiceRunning()) {
+            Intent scrappingService = new Intent(this, ScrappingService.class);
+            startService(scrappingService);
+        }
     }
 
     private void ValiderPermissions() {
@@ -139,6 +135,19 @@ public class MainActivity extends AppCompatActivity implements OnTriggerEditList
         startActivityForResult(intent, SETTINGS_PERMISSION);
     }
 
+    private boolean IsScrappingServiceRunning() {
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if(activityManager != null) {
+            for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+                if(ScrappingService.class.getName().equals(service.service.getClassName())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -166,5 +175,13 @@ public class MainActivity extends AppCompatActivity implements OnTriggerEditList
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit();
+    }
+
+    @Override
+    public void OpenLink(String link) {
+        if(link.equals("")) return;
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(link));
+        startActivity(intent);
     }
 }

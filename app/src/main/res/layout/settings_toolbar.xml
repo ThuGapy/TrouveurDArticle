@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/settings_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimaryDark"
@@ -42,14 +42,14 @@
             </LinearLayout>
 
             <ImageButton
-                android:id="@+id/settings_button"
+                android:id="@+id/reset_settings_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/settings"
-                android:src="@drawable/baseline_settings_24"
+                android:src="@drawable/baseline_restart_alt_24"
                 android:layout_marginEnd="24dp"
                 android:scaleX="1.5"
                 android:scaleY="1.5"

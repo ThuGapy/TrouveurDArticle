@@ -12,4 +12,8 @@ public class ScrapperResult {
     public String GetStringifiedResult() {
         return "En stock: " + EnStock + " | Prix: " + Prix;
     }
+
+    public static boolean Same(ScrapperResult result1, ScrapperResult result2) {
+        return (result1.EnStock == result2.EnStock) && (result1.Prix == result2.Prix);
+    }
 }

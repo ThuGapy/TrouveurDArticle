@@ -1,15 +1,18 @@
 package net.info420.trouveurarticle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import net.info420.trouveurarticle.database.AppSettings;
@@ -21,6 +24,23 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         settings = new AppSettings(getApplicationContext());
+
+        Toolbar toolbar = findViewById(R.id.settings_toolbar);
+        setSupportActionBar(toolbar);
+
+        TextView toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
+        toolbarTitle.setText("Options");
+        TextView toolbarSubtitle = toolbar.findViewById(R.id.toolbar_subtitle);
+        toolbarSubtitle.setText("Changez les paramètres de l'application!");
+
+        ImageButton resetSettingsButton = toolbar.findViewById(R.id.reset_settings_button);
+        resetSettingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Reset(v);
+            }
+        });
+
         UpdateEntryData();
     }
 
