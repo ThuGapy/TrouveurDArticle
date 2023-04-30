@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="80dp"
     android:gravity="center_vertical"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/light_gray"
+    android:foreground="@drawable/thin_border">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +20,7 @@
             android:background="@color/displayerror_color"
             android:clipToOutline="true"
             android:elevation="2dp"
-            android:foreground="@drawable/border"
+            android:foreground="@drawable/thin_border"
             android:outlineProvider="bounds"
             android:padding="4dp" />
 
@@ -27,25 +29,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Sony PlayStation 5 Disc Edition"
-            android:textSize="18sp"
-            android:layout_marginLeft="8dp"
+            android:ellipsize="end"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:gravity="left|center_vertical" />
 
         <ImageButton
+            android:id="@+id/edit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_mode_edit_24"
             android:background="@android:color/transparent"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="16dp"
             android:layout_gravity="right|center_vertical" />
 
         <ImageButton
+            android:id="@+id/delete_item_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_delete_24"
             android:background="@android:color/transparent"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="16dp"
             android:layout_gravity="right|center_vertical" />
 
         <ImageButton
@@ -53,7 +59,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_remove_red_eye_24"
             android:background="@android:color/transparent"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="16dp"
             android:layout_gravity="right|center_vertical" />
     </LinearLayout>
 

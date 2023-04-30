@@ -11,19 +11,35 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="4dp"
-            android:textSize="24sp"
-            android:textColor="@color/black"
-            android:text="Options" />
+            android:layout_marginTop="12dp">
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            <TextView
+                android:id="@+id/options_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textSize="24sp"
+                android:textColor="@color/black"
+                android:text="Options" />
+
+            <ImageButton
+                android:id="@+id/reset_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/baseline_restart_alt_24"
+                android:background="@android:color/transparent"
+                android:layout_marginRight="24dp"
+                android:onClick="Reset"
+                android:contentDescription="Reset" />
+
+        </RelativeLayout>
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -43,7 +59,7 @@
             android:singleLine="true"
             android:background="@drawable/border"/>
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -63,7 +79,7 @@
             android:singleLine="true"
             android:background="@drawable/border"/>
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -84,7 +100,7 @@
             android:background="@drawable/border"/>
 
         <CheckBox
-            android:id="@+id/enable_cell_data_refresh"
+            android:id="@+id/disable_cell_data_refresh"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -108,7 +124,7 @@
             android:text="Désactiver le rafraichissement lorsque la batterie est faible" />
 
         <CheckBox
-            android:id="@+id/enable_javascript"
+            android:id="@+id/automatically_replace_product_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -117,7 +133,7 @@
             android:layout_marginBottom="4dp"
             android:layoutDirection="rtl"
             android:textColor="@color/black"
-            android:text="Activer l'utilisation de JavaScript (BestBuy utilise JavaScript)" />
+            android:text="Remplacer automatiquement le nom du produit par celui de la page web" />
     </LinearLayout>
 
     <LinearLayout

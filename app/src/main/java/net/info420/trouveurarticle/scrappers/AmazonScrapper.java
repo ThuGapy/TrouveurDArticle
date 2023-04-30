@@ -4,7 +4,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 public class AmazonScrapper extends Scrapper{
-    public String LinkCleaner(String link) {
+    public static final String StoreName = "amazon.ca";
+    public static final String SearchLinkStart = "https://www.amazon.ca/s?k=";
+    public static String SearchLink(String toSearch) {
+        return SearchLinkStart + toSearch.replace(" ", "+");
+    }
+    public static String LinkCleaner(String link) {
+        if(link == null || link.equals("")) return null;
         int dpIndex = link.indexOf("dp/");
         int nextSlash = link.substring(dpIndex + 3).indexOf("/");
         return link.substring(0, dpIndex + nextSlash + 3);
@@ -41,5 +47,14 @@ public class AmazonScrapper extends Scrapper{
         }
 
         return new ScrapperResult(isInStock, price);
+    }
+
+    @Override
+    public String FetchProductName(Document document) {
+        Element productNameElement = document.selectFirst("#productTitle");
+        if(productNameElement != null) {
+            return productNameElement.text().trim();
+        }
+        return null;
     }
 }

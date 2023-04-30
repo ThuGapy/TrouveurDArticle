@@ -11,4 +11,5 @@
     <color name="overpriced_color">#F1C40F</color>
     <color name="oos_color">#C0392B</color>
     <color name="displayerror_color">#9B59B6</color>
+    <color name="light_gray">#EEEEEE</color>
 </resources>

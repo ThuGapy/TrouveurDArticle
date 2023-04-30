@@ -17,9 +17,10 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Scrapper {
-    public String LinkCleaner(String link) {
+    public static String LinkCleaner(String link) {
         return link;
     }
     protected Document GetDocument(String link) {
@@ -44,72 +45,15 @@ public abstract class Scrapper {
     }
 
     public abstract ScrapperResult Fetch(Document doc);
+    public abstract String FetchProductName(Document doc);
 
     public ScrapperResult Fetch(String link) {
         Document document = GetDocument(link);
-        System.out.println(document.html());
-
-        return Fetch(document);
+        return document == null ? null : Fetch(document);
     };
 
-    public ScrapperResult Fetch(String link, Context context) {
-        Looper.prepare();
-        Handler handler = new Handler();
-
-        WebView webView = new WebView(context);
-        String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36";
-        webView.getSettings().setUserAgentString(userAgent);
-
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setDomStorageEnabled(true);
-        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        webView.getSettings().setAllowContentAccess(true);
-        webView.getSettings().setAllowFileAccess(true);
-        webView.getSettings().setAllowFileAccessFromFileURLs(true);
-        webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        webView.evaluateJavascript("(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();", new ValueCallback<String>() {
-                            @Override
-                            public void onReceiveValue(String value) {
-                                String unescapedHtmlContent = StringEscapeUtils.unescapeJava(value);
-                                unescapedHtmlContent = unescapedHtmlContent.substring(1, unescapedHtmlContent.length() - 1);
-                                Document document = Jsoup.parse(unescapedHtmlContent);
-                            }
-                        });
-                    }
-                }, 5000);
-            }
-        });
-
-        webView.setWebChromeClient(new WebChromeClient());
-
-        Map<String, String> headers = new HashMap<>();
-        //headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        /*headers.put("Accept-Encoding", "gzip, deflate, br");
-        headers.put("Accept-Language", "en-CA,en;q=0.9");
-        headers.put("Connection", "keep-alive");
-        headers.put("DNT", "1");
-        headers.put("Referer", "https://slanrevolution.net");
-        headers.put("Sec-Fetch-Dest", "document");
-        headers.put("Sec-Fetch-Mode", "navigate");
-        headers.put("Sec-Fetch-Site", "none");
-        headers.put("Upgrade-Insecure-Requests", "1");*/
-
-        headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        headers.put("Accept-Encoding", "gzip, deflate, br");
-        headers.put("Accept-Language", "en-CA,en;q=0.5");
-        headers.put("Connection", "keep-alive");
-        headers.put("Referer", "https://walmart.ca");
-        //headers.put("Upgrade-Insecure-Requests", "1");
-
-        webView.loadUrl(link, headers);
-
-        Looper.loop();
-        return null;
+    public String FetchProductName(String link) {
+        Document document = GetDocument(link);
+        return document == null ? "" : FetchProductName(document);
     }
 }

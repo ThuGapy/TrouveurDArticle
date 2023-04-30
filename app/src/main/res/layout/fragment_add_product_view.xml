@@ -41,6 +41,7 @@
             android:layout_marginLeft="16dp">
 
             <EditText
+                android:id="@+id/product_name_edit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -82,36 +83,6 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Lien BestBuy.ca" />
-
-        <net.info420.trouveurarticle.views.AddProductButtonGroup
-            android:id="@+id/bestbuy_button_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="4dp"
-            android:textColor="@color/black"
-            android:text="Lien Staples.ca" />
-
-        <net.info420.trouveurarticle.views.AddProductButtonGroup
-            android:id="@+id/staples_button_group"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="4dp"
-            android:textColor="@color/black"
             android:text="Lien Newegg.ca" />
 
         <net.info420.trouveurarticle.views.AddProductButtonGroup
@@ -127,7 +98,37 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Prix de détail suggéré" />
+            android:text="Lien CanadaComputers.com" />
+
+        <net.info420.trouveurarticle.views.AddProductButtonGroup
+            android:id="@+id/canada_computers_button_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/black"
+            android:text="Lien MemoryExpress.com" />
+
+        <net.info420.trouveurarticle.views.AddProductButtonGroup
+            android:id="@+id/memory_express_button_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/black"
+            android:text="Prix désiré" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -137,6 +138,7 @@
             android:layout_marginLeft="16dp">
 
             <EditText
+                android:id="@+id/price_textbox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -151,15 +153,6 @@
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
                 android:contentDescription="Vider"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="@color/black" />
-
-            <ImageButton
-                android:id="@+id/price_search_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_menu_search"
-                android:contentDescription="Rechercher"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 app:tint="@color/black" />
         </LinearLayout>
@@ -192,5 +185,13 @@
             android:layout_weight="1"
             android:layout_marginLeft="8dp"
             android:text="Ajouter le produit" />
+
+        <Button
+            android:id="@+id/save_changes_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Modifier"
+            android:visibility="gone"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

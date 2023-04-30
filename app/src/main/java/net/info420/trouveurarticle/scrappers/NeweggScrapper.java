@@ -4,8 +4,19 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 public class NeweggScrapper extends Scrapper{
-    public String LinkCleaner(String link) {
-        return link.substring(0, link.lastIndexOf("?"));
+    public static final String StoreName = "newegg.ca";
+    public static final String SearchLinkStart = "https://www.newegg.ca/p/pl?d=";
+    public static String SearchLink(String toSearch) {
+        return SearchLinkStart + toSearch.replace(" ", "+");
+    }
+    public static String LinkCleaner(String link) {
+        if(link == null || link.equals("")) return null;
+        int lastIndex = link.lastIndexOf("?");
+        if(lastIndex != -1) {
+            return link.substring(0, link.lastIndexOf("?"));
+        } else {
+            return link;
+        }
     }
     @Override
     public ScrapperResult Fetch(Document document) {
@@ -38,5 +49,14 @@ public class NeweggScrapper extends Scrapper{
         }
 
         return new ScrapperResult(isInStock, price);
+    }
+
+    @Override
+    public String FetchProductName(Document document) {
+        Element productNameElement = document.selectFirst(".product-title");
+        if(productNameElement != null) {
+            return productNameElement.text().trim();
+        }
+        return null;
     }
 }
