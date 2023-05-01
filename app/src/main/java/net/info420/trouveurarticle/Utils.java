@@ -12,15 +12,15 @@ public class Utils {
 
         int dotIndex = priceDecimalText.indexOf(".");
         if (dotIndex == -1) {
-            return String.valueOf(price) + ".00$";
+            return "$" + String.valueOf(price) + ".00";
         } else {
             String decimal = priceDecimalText.substring(dotIndex + 1);
             if (decimal.length() == 0) {
-                return priceTotal + ".00$";
+                return "$" + priceTotal + ".00$";
             } else if (decimal.length() == 1) {
-                return priceTotal + "." + decimal + "0$";
+                return "$" + priceTotal + "." + decimal + "0";
             } else {
-                return priceTotal + "." + decimal + "$";
+                return "$" + priceTotal + "." + decimal + "";
             }
         }
     }

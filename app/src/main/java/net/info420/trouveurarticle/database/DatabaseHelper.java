@@ -25,6 +25,7 @@ import net.info420.trouveurarticle.scrappers.NeweggScrapper;
 import net.info420.trouveurarticle.scrappers.Scrapper;
 import net.info420.trouveurarticle.scrappers.ScrapperResult;
 import net.info420.trouveurarticle.scrappers.StoreFront;
+import net.info420.trouveurarticle.views.graphs.DollarFormatter;
 
 import java.sql.Array;
 import java.text.SimpleDateFormat;
@@ -338,6 +339,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         LineDataSet dataSet = new LineDataSet(entries, nom);
         dataSet.setColor(color);
+        dataSet.setValueFormatter(new DollarFormatter());
+        dataSet.setValueTextSize(12f);
+        dataSet.setLineWidth(3f);
 
         return dataSet;
     }

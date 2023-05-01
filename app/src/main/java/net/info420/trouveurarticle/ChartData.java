@@ -130,7 +130,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         targetLine.setLineWidth(1f);
         targetLine.setTextColor(Color.BLACK);
         targetLine.setTextSize(12f);
-        targetLine.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
+        targetLine.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
 
         leftAxis.addLimitLine(targetLine);
 
