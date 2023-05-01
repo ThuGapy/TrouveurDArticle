@@ -6,11 +6,11 @@ import android.preference.PreferenceManager;
 
 public class AppSettings {
     private static final String PREF_REFRESH_TIME = "refresh_time";
-    public static final int DefaultRefreshTime = 30;
+    public static final int DefaultRefreshTime = 120;
     private static final String PREF_REFRESH_TIME_CELL_DATA = "refresh_time_cell_data";
-    public static final int DefaultRefreshTimeCellData = 60;
+    public static final int DefaultRefreshTimeCellData = 180;
     private static final String PREF_REFRESH_TIME_CELL_PLUGGING_IN = "refresh_time_cell_plugged_in";
-    public static final int DefaultRefreshTimeCellPluggedIn = 15;
+    public static final int DefaultRefreshTimeCellPluggedIn = 60;
     private static final String PREF_DISABLE_REFRESH_CELL_DATA = "disable_refresh_cell_data";
     public static final boolean DefaultDisableRefreshCellData = true;
     private static final String PREF_DISABLE_REFRESH_BATTERY_LOW = "disable_refresh_battery_low";
@@ -93,7 +93,7 @@ public class AppSettings {
 
     public void ResetSettings() {
         sharedPreferences.edit().putInt(PREF_REFRESH_TIME, DefaultRefreshTime).apply();
-        sharedPreferences.edit().putInt(PREF_DISABLE_REFRESH_CELL_DATA, DefaultRefreshTimeCellData).apply();
+        sharedPreferences.edit().putInt(PREF_REFRESH_TIME_CELL_DATA, DefaultRefreshTimeCellData).apply();
         sharedPreferences.edit().putInt(PREF_REFRESH_TIME_CELL_PLUGGING_IN, DefaultRefreshTimeCellPluggedIn).apply();
         sharedPreferences.edit().putBoolean(PREF_DISABLE_REFRESH_CELL_DATA, DefaultDisableRefreshCellData).apply();
         sharedPreferences.edit().putBoolean(PREF_DISABLE_REFRESH_BATTERY_LOW, DefaultDisableRefreshBatteryLow).apply();
