@@ -188,8 +188,8 @@ public class FollowedItemAdapter extends CursorAdapter {
             });
 
             itemName.setTypeface(null, Typeface.BOLD);
-            itemName.setPaintFlags(itemName
-                    .getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+            itemName.setPaintFlags(itemName.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+            itemName.setTextColor(context.getResources().getColor(R.color.dark_blue));
 
             productPrice.setVisibility(View.VISIBLE);
             String priceTotal = String.valueOf((int)Math.floor(price));

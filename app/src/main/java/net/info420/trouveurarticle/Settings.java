@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.info420.trouveurarticle.database.AppSettings;
+import net.info420.trouveurarticle.database.DatabaseHelper;
 
 public class Settings extends AppCompatActivity {
     private AppSettings settings;
@@ -42,6 +43,30 @@ public class Settings extends AppCompatActivity {
         });
 
         UpdateEntryData();
+    }
+
+    public void DeleteScrapeResults(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Êtes vous certain de vouloir supprimer les données des pages de produits?");
+        builder.setTitle("Confirmation");
+        builder.setPositiveButton("Confirmer", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
+                dbHelper.deleteAllScrapeResults();
+                Toast.makeText(getApplicationContext(), "Données des pages de produits supprimés", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     public void Retour(View view) {
@@ -79,6 +104,7 @@ public class Settings extends AppCompatActivity {
         CheckBox disableRefreshCellData = findViewById(R.id.disable_cell_data_refresh);
         CheckBox disableRefreshBatteryLow = findViewById(R.id.disable_refresh_battery_low);
         CheckBox enableAutomaticProductName = findViewById(R.id.automatically_replace_product_name);
+        CheckBox enableAutomaticHomePageRefresh = findViewById(R.id.automatically_refresh_home_screen);
 
         settings.setRefreshTime(Integer.parseInt(String.valueOf(refreshTimeEditText.getText())));
         settings.setRefreshTimeCellData(Integer.parseInt(String.valueOf(refreshTimeCellDataEditText.getText())));
@@ -86,6 +112,7 @@ public class Settings extends AppCompatActivity {
         settings.setDisableRefreshCellData(disableRefreshCellData.isChecked());
         settings.setDisableRefreshBatteryLow(disableRefreshBatteryLow.isChecked());
         settings.setAutomaticallyReplaceProductName(enableAutomaticProductName.isChecked());
+        settings.setAutomaticallyRefreshHomeScreen(enableAutomaticHomePageRefresh.isChecked());
 
         Toast.makeText(this, "Les paramètres sont sauvegardés", Toast.LENGTH_LONG).show();
     }
@@ -97,6 +124,7 @@ public class Settings extends AppCompatActivity {
         CheckBox disableRefreshCellData = findViewById(R.id.disable_cell_data_refresh);
         CheckBox disableRefreshBatteryLow = findViewById(R.id.disable_refresh_battery_low);
         CheckBox enableAutomaticProductName = findViewById(R.id.automatically_replace_product_name);
+        CheckBox enableAutomaticHomePageRefresh = findViewById(R.id.automatically_refresh_home_screen);
 
         refreshTimeEditText.setText(String.valueOf(settings.getRefreshTime()));
         refreshTimeCellDataEditText.setText(String.valueOf(settings.getRefreshTimeCellData()));
@@ -104,5 +132,6 @@ public class Settings extends AppCompatActivity {
         disableRefreshCellData.setChecked(settings.getDisableRefreshCellData());
         disableRefreshBatteryLow.setChecked(settings.getDisableRefreshBatteryLow());
         enableAutomaticProductName.setChecked(settings.getAutomaticallyReplaceProductName());
+        enableAutomaticHomePageRefresh.setChecked(settings.getAutomaticallyRefreshHomeScreen());
     }
 }

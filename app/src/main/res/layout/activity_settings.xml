@@ -109,6 +109,28 @@
             android:layoutDirection="rtl"
             android:textColor="@color/black"
             android:text="Remplacer automatiquement le nom du produit par celui de la page web" />
+
+        <CheckBox
+            android:id="@+id/automatically_refresh_home_screen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="4dp"
+            android:layoutDirection="rtl"
+            android:textColor="@color/black"
+            android:text="Automatiquement rafraichir la page d'accueil chaque 10 secondes" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="4dp"
+            android:text="Supprimer les données des pages de produits"
+            android:onClick="DeleteScrapeResults" />
     </LinearLayout>
 
     <LinearLayout
