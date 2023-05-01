@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <permission
         android:name="net.info420.trouveurarticle.permissions.OPTION_PERMISSION"
-        android:protectionLevel="dangerous"
-        android:label="@string/custom_permission_description" />
+        android:label="@string/custom_permission_description"
+        android:protectionLevel="dangerous" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -20,17 +20,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TrouveurArticle"
-        tools:targetApi="31" >
+        tools:targetApi="31">
+        <activity
+            android:name=".ChartData"
+            android:exported="false" />
         <activity
             android:name=".Settings"
-            android:theme="@style/NoActionBarTheme"
             android:exported="false"
-            android:permission="net.info420.trouveurarticle.permissions.OPTION_PERMISSION"/>
-
+            android:permission="net.info420.trouveurarticle.permissions.OPTION_PERMISSION"
+            android:theme="@style/NoActionBarTheme" />
         <activity
             android:name=".MainActivity"
-            android:theme="@style/NoActionBarTheme"
-            android:exported="true" >
+            android:exported="true"
+            android:theme="@style/NoActionBarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

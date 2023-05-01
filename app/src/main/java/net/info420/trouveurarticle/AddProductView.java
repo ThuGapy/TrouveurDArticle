@@ -219,7 +219,11 @@ public class AddProductView extends Fragment {
                             }
 
                             dbHelper.createNewItem(stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
+
                             ShowToast("Produit ajouté");
+
+                            OnTriggerEditListener listener = (OnTriggerEditListener) getActivity();
+                            listener.EditDone();
                         } else {
                             ShowToast("Impossible de modifier le produit");
                         }

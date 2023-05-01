@@ -31,6 +31,7 @@ public class ScrappingService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         GetShouldBeInterval();
+        CancelCurrentRunnable();
 
         if(shouldFetchData) {
             ScheduleService(currentInterval);
@@ -53,86 +54,97 @@ public class ScrappingService extends Service {
                 int previousInterval = currentInterval;
                 GetShouldBeInterval();
 
+                System.out.println("Current interval: " + currentInterval + " Should Fetch Data: " + shouldFetchData);
+
                 Cursor produitCursor = dbHelper.getAllItems();
-
                 if(produitCursor != null) {
-                    while(produitCursor.moveToNext()) {
-                        String amazonLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("amazon"));
-                        String neweggLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("newegg"));
-                        String canadaComputersLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("canadacomputers"));
-                        String memoryExpressLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("memoryexpress"));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            while(produitCursor.moveToNext()) {
+                                String amazonLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("amazon"));
+                                String neweggLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("newegg"));
+                                String canadaComputersLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("canadacomputers"));
+                                String memoryExpressLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("memoryexpress"));
 
-                        if(amazonLink != null && !amazonLink.equals("")) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
+                                if(amazonLink != null && !amazonLink.equals("")) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
 
-                                    AmazonScrapper amazonScrapper = new AmazonScrapper();;
-                                    ScrapperResult amazonResult = amazonScrapper.Fetch(amazonLink);
-                                    if(amazonResult != null) {
-                                        dbHelper.createScrapeResult(amazonLink, amazonResult);
-                                    }
+                                            AmazonScrapper amazonScrapper = new AmazonScrapper();;
+                                            ScrapperResult amazonResult = amazonScrapper.Fetch(amazonLink);
+                                            if(amazonResult != null) {
+                                                dbHelper.createScrapeResult(amazonLink, amazonResult);
+                                            }
+                                        }
+                                    }).start();
                                 }
-                            }).start();
-                        }
 
-                        if(neweggLink != null && !neweggLink.equals("")) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
+                                if(neweggLink != null && !neweggLink.equals("")) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
 
-                                    NeweggScrapper neweggScrapper = new NeweggScrapper();;
-                                    ScrapperResult neweggResult = neweggScrapper.Fetch(neweggLink);
-                                    if(neweggResult != null) {
-                                        dbHelper.createScrapeResult(neweggLink, neweggResult);
-                                    }
+                                            NeweggScrapper neweggScrapper = new NeweggScrapper();;
+                                            ScrapperResult neweggResult = neweggScrapper.Fetch(neweggLink);
+                                            if(neweggResult != null) {
+                                                dbHelper.createScrapeResult(neweggLink, neweggResult);
+                                            }
+                                        }
+                                    }).start();
                                 }
-                            }).start();
-                        }
 
-                        if(canadaComputersLink != null && !canadaComputersLink.equals("")) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
+                                if(canadaComputersLink != null && !canadaComputersLink.equals("")) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
 
-                                    CanadaComputersScrapper canadaComputersScrapper = new CanadaComputersScrapper();;
-                                    ScrapperResult canadaComputersResult = canadaComputersScrapper.Fetch(canadaComputersLink);
-                                    if(canadaComputersResult != null) {
-                                        dbHelper.createScrapeResult(canadaComputersLink, canadaComputersResult);
-                                    }
+                                            CanadaComputersScrapper canadaComputersScrapper = new CanadaComputersScrapper();;
+                                            ScrapperResult canadaComputersResult = canadaComputersScrapper.Fetch(canadaComputersLink);
+                                            if(canadaComputersResult != null) {
+                                                dbHelper.createScrapeResult(canadaComputersLink, canadaComputersResult);
+                                            }
+                                        }
+                                    }).start();
                                 }
-                            }).start();
-                        }
 
-                        if(memoryExpressLink != null && !memoryExpressLink.equals("")) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
+                                if(memoryExpressLink != null && !memoryExpressLink.equals("")) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
 
-                                    MemoryExpressScrapper memoryExpressScrapper = new MemoryExpressScrapper();;
-                                    ScrapperResult memoryExpressResult = memoryExpressScrapper.Fetch(memoryExpressLink);
-                                    if(memoryExpressResult != null) {
-                                        dbHelper.createScrapeResult(memoryExpressLink, memoryExpressResult);
-                                    }
+                                            MemoryExpressScrapper memoryExpressScrapper = new MemoryExpressScrapper();;
+                                            ScrapperResult memoryExpressResult = memoryExpressScrapper.Fetch(memoryExpressLink);
+                                            if(memoryExpressResult != null) {
+                                                dbHelper.createScrapeResult(memoryExpressLink, memoryExpressResult);
+                                            }
+                                        }
+                                    }).start();
                                 }
-                            }).start();
-                        }
-                    }
 
-                    produitCursor.close();
+                                try {
+                                    Thread.sleep(2500);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+
+                            produitCursor.close();
+                        }
+                    }).start();
                 }
-
-                if(!shouldFetchData) {
+                if (!shouldFetchData) {
                     CancelCurrentRunnable();
                     SchedulePendingService();
                 } else {
-                    if(previousInterval != currentInterval) {
+                    if (previousInterval != currentInterval) {
                         CancelCurrentRunnable();
                         ScheduleService(currentInterval);
+                    } else {
+                        serviceHandler.postDelayed(serviceRunnable, currentInterval * 1000);
                     }
                 }
-
-                serviceHandler.postDelayed(this, previousInterval * 1000);
             }
         };
 

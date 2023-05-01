@@ -14,7 +14,7 @@ import net.info420.trouveurarticle.scrappers.NeweggScrapper;
 import net.info420.trouveurarticle.scrappers.ScrapperResult;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 3;
     private static final String DB_NAME = "trouveur_article";
     private static final String ITEM_TABLE = "produits";
     private static final String LINK_TABLE = "scrape_results";
@@ -27,14 +27,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + "newegg TEXT,"
             + "canadacomputers TEXT,"
             + "memoryexpress TEXT,"
-            + "prix DOUBLE NOT NULL"
+            + "prix REAL NOT NULL"
             + ")";
 
     private static final String CreateLinkTable = "CREATE TABLE " + LINK_TABLE + "("
             + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
             + "link TEXT NOT NULL,"
             + "instock INTEGER NOT NULL,"
-            + "prix DOUBLE NOT NULL,"
+            + "prix REAL NOT NULL,"
             + "temps TEXT DEFAULT CURRENT_TIMESTAMP"
             + ")";
 
@@ -165,9 +165,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void deleteRelatedScrapeResults(int ID) {
+        SQLiteDatabase wdb = getWritableDatabase();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor readCursor = db.rawQuery("SELECT amazon, newegg, canadacomputers, memoryexpress FROM produits WHERE id = " + ID, null);
+        if(readCursor.moveToFirst()) {
+            try {
+                String amazonLink = readCursor.getString(readCursor.getColumnIndexOrThrow("amazon"));
+                String neweggLink = readCursor.getString(readCursor.getColumnIndexOrThrow("newegg"));
+                String canadaComputersLink = readCursor.getString(readCursor.getColumnIndexOrThrow("canadacomputers"));
+                String memoryExpressLink = readCursor.getString(readCursor.getColumnIndexOrThrow("memoryexpress"));
+                wdb.execSQL("DELETE FROM scrape_results WHERE link = '" + amazonLink + "' OR link = '" + neweggLink + "' OR link = '" + canadaComputersLink + "' OR link = '" + memoryExpressLink + "'");
+            } catch (IllegalArgumentException ex) {}
+        }
+
+        wdb.close();
+        db.close();
+    }
+
     public void deleteItem(int ID) {
+        deleteRelatedScrapeResults(ID);
+
         SQLiteDatabase db = getWritableDatabase();
         db.delete("produits", "id = ?", new String[] {String.valueOf(ID)});
+        db.close();
     }
 
     public void deleteAllScrapeResults() {

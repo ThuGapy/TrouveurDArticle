@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -32,6 +33,8 @@ import net.info420.trouveurarticle.scrappers.NeweggScrapper;
 import net.info420.trouveurarticle.scrappers.ScrapperResult;
 import net.info420.trouveurarticle.scrappers.ScrappingService;
 import net.info420.trouveurarticle.views.OnTriggerEditListener;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnTriggerEditListener {
 
@@ -91,9 +94,11 @@ public class MainActivity extends AppCompatActivity implements OnTriggerEditList
 
         ValiderPermissions();
 
+        StopAllRunningScrappingService();
         if(!IsScrappingServiceRunning()) {
-            Intent scrappingService = new Intent(this, ScrappingService.class);
-            startService(scrappingService);
+            Intent scrappingService2 = new Intent(this, ScrappingService.class);
+            startService(scrappingService2);
+            System.out.println("Started scrapping service");
         }
     }
 
@@ -146,6 +151,24 @@ public class MainActivity extends AppCompatActivity implements OnTriggerEditList
         }
 
         return false;
+    }
+
+    private void StopAllRunningScrappingService() {
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        ComponentName componentName = new ComponentName(this, ScrappingService.class);
+
+        if (activityManager != null) {
+            List<ActivityManager.RunningServiceInfo> runningServices = activityManager.getRunningServices(Integer.MAX_VALUE);
+
+            for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+                if (service.service.equals(componentName)) {
+                    Intent stopServiceIntent = new Intent(this, ScrappingService.class);
+                    stopService(stopServiceIntent);
+
+                    System.out.println("Stopped Scrapping Service");
+                }
+            }
+        }
     }
 
     @Override

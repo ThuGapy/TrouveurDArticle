@@ -6,6 +6,8 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -113,11 +115,9 @@ public class FollowedItemAdapter extends CursorAdapter {
             }
         });
 
-        ImageButton seeButton = view.findViewById(R.id.see_button);
-
         PRICE_STATUS status = PRICE_STATUS.NO_DATA;
         boolean inStock = false;
-        double price = 0;
+        double price = -1;
         String lowestPriceLink = "";
 
         if(cursor.getInt(amazonStockIndex) == 1) {
@@ -127,39 +127,27 @@ public class FollowedItemAdapter extends CursorAdapter {
         }
         if(cursor.getInt(neweggStockIndex) == 1) {
             inStock = true;
-            if(cursor.getDouble(neweggPriceIndex) < price) {
-                price = cursor.getDouble(amazonPriceIndex);
+            if(cursor.getDouble(neweggPriceIndex) < price || price == -1) {
+                price = cursor.getDouble(neweggPriceIndex);
                 lowestPriceLink = cursor.getString(neweggLinkIndex);
             }
         }
         if(cursor.getInt(canadaComputersStockIndex) == 1) {
             inStock = true;
-            if(cursor.getDouble(canadaComputersPriceIndex) < price) {
+            if(cursor.getDouble(canadaComputersPriceIndex) < price || price == -1) {
                 price = cursor.getDouble(canadaComputersPriceIndex);
                 lowestPriceLink = cursor.getString(canadaComputersLinkIndex);
             }
         }
         if(cursor.getInt(memoryExpressStockIndex) == 1) {
             inStock = true;
-            if(cursor.getFloat(memoryExpressPriceIndex) < price) {
+            if(cursor.getFloat(memoryExpressPriceIndex) < price || price == -1) {
                 price = cursor.getDouble(memoryExpressPriceIndex);
                 lowestPriceLink = cursor.getString(memoryExpressLinkIndex);
             }
         }
 
-        String seeLink = lowestPriceLink;
-        seeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activityEditListener.OpenLink(seeLink);
-            }
-        });
-
         float targetPrice = cursor.getFloat(prixIndex);
-
-        System.out.println(inStock);
-        System.out.println(price);
-        System.out.println(targetPrice);
 
         if(inStock && price <= targetPrice) {
             status = PRICE_STATUS.GOOD;
@@ -170,8 +158,6 @@ public class FollowedItemAdapter extends CursorAdapter {
         } else {
             status = PRICE_STATUS.OOS;
         }
-
-        System.out.println(status);
 
         itemName.setText(cursor.getString(nomArticleIndex));
 
@@ -190,5 +176,40 @@ public class FollowedItemAdapter extends CursorAdapter {
                 break;
         }
 
+        TextView productPrice = view.findViewById(R.id.price_text);
+
+        if(status == PRICE_STATUS.GOOD || status == PRICE_STATUS.OVERPRICED) {
+            String seeLink = lowestPriceLink;
+            itemName.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    activityEditListener.OpenLink(seeLink);
+                }
+            });
+
+            itemName.setTypeface(null, Typeface.BOLD);
+            itemName.setPaintFlags(itemName
+                    .getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
+            productPrice.setVisibility(View.VISIBLE);
+            String priceTotal = String.valueOf((int)Math.floor(price));
+            String priceDecimalText = String.valueOf(price);
+
+            int dotIndex = priceDecimalText.indexOf(".");
+            if (dotIndex == -1) {
+                productPrice.setText(String.valueOf(price) + ".00$");
+            } else {
+                String decimal = priceDecimalText.substring(dotIndex + 1);
+                if (decimal.length() == 0) {
+                    productPrice.setText(priceTotal + ".00$");
+                } else if (decimal.length() == 1) {
+                    productPrice.setText(priceTotal + "." + decimal + "0$");
+                } else {
+                    productPrice.setText(priceTotal + "." + decimal + "$");
+                }
+            }
+        } else {
+            productPrice.setVisibility(View.GONE);
+        }
     }
 }
