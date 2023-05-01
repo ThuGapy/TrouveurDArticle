@@ -3,15 +3,28 @@ package net.info420.trouveurarticle.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.ContactsContract;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import net.info420.trouveurarticle.scrappers.AmazonScrapper;
 import net.info420.trouveurarticle.scrappers.CanadaComputersScrapper;
 import net.info420.trouveurarticle.scrappers.MemoryExpressScrapper;
 import net.info420.trouveurarticle.scrappers.NeweggScrapper;
 import net.info420.trouveurarticle.scrappers.ScrapperResult;
+import net.info420.trouveurarticle.scrappers.StoreFront;
+
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 3;
@@ -91,6 +104,111 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
 
         return cursor;
+    }
+
+    public Cursor getLatestLinkData(String link) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] columns = {"id", "link", "instock", "prix", "temps"};
+        String where = "link = '" + link + "'";
+
+        Cursor cursor = db.query("scrape_results", columns, where, null, null, null, "id DESC", "1");
+
+        if(cursor != null) {
+            cursor.moveToFirst();
+        }
+
+        return cursor;
+    }
+
+    public List<LinkStatus> getStoreFrontStatus(int ID) {
+        List<LinkStatus> statusList = new ArrayList<LinkStatus>();
+
+        Cursor cursor = getItem(ID);
+        double prix = cursor.getDouble(cursor.getColumnIndexOrThrow("prix"));
+        String amazonLink = cursor.getString(cursor.getColumnIndexOrThrow("amazon"));
+        String neweggLink = cursor.getString(cursor.getColumnIndexOrThrow("newegg"));
+        String canadaComputersLink = cursor.getString(cursor.getColumnIndexOrThrow("canadacomputers"));
+        String memoryExpressLink = cursor.getString(cursor.getColumnIndexOrThrow("memoryexpress"));
+
+        Cursor linkData;
+        double price;
+        boolean stock;
+
+        if(amazonLink != null) {
+            if (!amazonLink.equals("")) {
+                linkData = getLatestLinkData(amazonLink);
+                try {
+                    price = linkData.getDouble(linkData.getColumnIndexOrThrow("prix"));
+                    stock = linkData.getInt(linkData.getColumnIndexOrThrow("instock")) == 1;
+
+                    LinkStatus amazonResult = new LinkStatus(stock, price, linkData.getString(linkData.getColumnIndexOrThrow("temps")), amazonLink, StoreFront.Amazon);
+                    amazonResult.DetermineStatus(prix);
+                    statusList.add(amazonResult);
+                } catch (IllegalArgumentException | CursorIndexOutOfBoundsException ex) {
+                    statusList.add(new LinkStatus(false, 0, "", "", StoreFront.Amazon));
+                }
+
+                linkData.close();
+            }
+        }
+
+        if(neweggLink != null) {
+            if (!neweggLink.equals("")) {
+                linkData = getLatestLinkData(neweggLink);
+                try {
+                    price = linkData.getDouble(linkData.getColumnIndexOrThrow("prix"));
+                    stock = linkData.getInt(linkData.getColumnIndexOrThrow("instock")) == 1;
+
+                    LinkStatus neweggResult = new LinkStatus(stock, price, linkData.getString(linkData.getColumnIndexOrThrow("temps")), neweggLink, StoreFront.Newegg);
+                    neweggResult.DetermineStatus(prix);
+                    statusList.add(neweggResult);
+                } catch (IllegalArgumentException | CursorIndexOutOfBoundsException ex) {
+                    statusList.add(new LinkStatus(false, 0, "", "", StoreFront.Newegg));
+                }
+
+                linkData.close();
+            }
+        }
+
+        if(canadaComputersLink != null) {
+            if (!canadaComputersLink.equals("")) {
+                linkData = getLatestLinkData(canadaComputersLink);
+                try {
+                    price = linkData.getDouble(linkData.getColumnIndexOrThrow("prix"));
+                    stock = linkData.getInt(linkData.getColumnIndexOrThrow("instock")) == 1;
+
+                    LinkStatus canadaComputersResult = new LinkStatus(stock, price, linkData.getString(linkData.getColumnIndexOrThrow("temps")), canadaComputersLink, StoreFront.CanadaComputers);
+                    canadaComputersResult.DetermineStatus(prix);
+                    statusList.add(canadaComputersResult);
+                } catch (IllegalArgumentException | CursorIndexOutOfBoundsException ex) {
+                    statusList.add(new LinkStatus(false, 0, "", "", StoreFront.CanadaComputers));
+                }
+
+                linkData.close();
+            }
+        }
+
+        if(memoryExpressLink != null) {
+            if (!memoryExpressLink.equals("")) {
+                linkData = getLatestLinkData(memoryExpressLink);
+                try {
+                    price = linkData.getDouble(linkData.getColumnIndexOrThrow("prix"));
+                    stock = linkData.getInt(linkData.getColumnIndexOrThrow("instock")) == 1;
+
+                    LinkStatus memoryExpressResult = new LinkStatus(stock, price, linkData.getString(linkData.getColumnIndexOrThrow("temps")), memoryExpressLink, StoreFront.MemoryExpress);
+                    memoryExpressResult.DetermineStatus(prix);
+                    statusList.add(memoryExpressResult);
+                } catch (IllegalArgumentException | CursorIndexOutOfBoundsException ex) {
+                    statusList.add(new LinkStatus(false, 0, "", "", StoreFront.MemoryExpress));
+                }
+
+                linkData.close();
+            }
+        }
+
+        Collections.sort(statusList);
+        return statusList;
     }
 
     public ScrapperResult getPreviousResult(String link) {

@@ -20,11 +20,17 @@ import net.info420.trouveurarticle.database.DatabaseHelper;
 
 public class Settings extends AppCompatActivity {
     private AppSettings settings;
+    private boolean FromProduct;
+    private int ID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         settings = new AppSettings(getApplicationContext());
+
+        Intent fromIntent = getIntent();
+        FromProduct = fromIntent.getBooleanExtra("fromProduct", false);
+        ID = fromIntent.getIntExtra("productID", 0);
 
         Toolbar toolbar = findViewById(R.id.settings_toolbar);
         setSupportActionBar(toolbar);
@@ -70,7 +76,14 @@ public class Settings extends AppCompatActivity {
     }
 
     public void Retour(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent;
+        if(FromProduct) {
+            intent = new Intent(getApplicationContext(), ChartData.class);
+            intent.putExtra("productID", ID);
+        } else {
+            intent = new Intent(getApplicationContext(), MainActivity.class);
+        }
+
         startActivity(intent);
     }
 

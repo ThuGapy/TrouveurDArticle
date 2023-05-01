@@ -1,14 +1,11 @@
 package net.info420.trouveurarticle.database;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,28 +15,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 
 import net.info420.trouveurarticle.R;
+import net.info420.trouveurarticle.Utils;
 import net.info420.trouveurarticle.views.OnRefreshRequestedListener;
-import net.info420.trouveurarticle.views.OnTriggerEditListener;
+import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
 public class FollowedItemAdapter extends CursorAdapter {
     private Context applicationContext;
     private DatabaseHelper dbHelper;
     private ListView adapterListView;
-    private OnTriggerEditListener activityEditListener;
+    private OnProductInteractionListener activityInteractionListener;
     private OnRefreshRequestedListener fragmentRefreshListener;
-    private enum PRICE_STATUS {
-        GOOD,
-        OVERPRICED,
-        OOS,
-        NO_DATA
-    }
 
-    public FollowedItemAdapter(Context context, OnTriggerEditListener editListener, OnRefreshRequestedListener refreshListener) {
+    public FollowedItemAdapter(Context context, OnProductInteractionListener editListener, OnRefreshRequestedListener refreshListener) {
         super(context, null, 0);
-        activityEditListener = editListener;
+        activityInteractionListener = editListener;
         fragmentRefreshListener = refreshListener;
     }
 
@@ -76,11 +67,19 @@ public class FollowedItemAdapter extends CursorAdapter {
         View colorIndicatorView = view.findViewById(R.id.color_indicator);
         TextView itemName = view.findViewById(R.id.item_name);
 
+        ImageButton seeButton = view.findViewById(R.id.see_button);
+        seeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activityInteractionListener.SeeChart(elementID);
+            }
+        });
+
         ImageButton editButton = view.findViewById(R.id.edit_button);
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                activityEditListener.TriggerEdit(elementID);
+                activityInteractionListener.TriggerEdit(elementID);
             }
         });
 
@@ -115,7 +114,7 @@ public class FollowedItemAdapter extends CursorAdapter {
             }
         });
 
-        PRICE_STATUS status = PRICE_STATUS.NO_DATA;
+        PriceStatus status = PriceStatus.NO_DATA;
         boolean inStock = false;
         double price = -1;
         String lowestPriceLink = "";
@@ -150,13 +149,13 @@ public class FollowedItemAdapter extends CursorAdapter {
         float targetPrice = cursor.getFloat(prixIndex);
 
         if(inStock && price <= targetPrice) {
-            status = PRICE_STATUS.GOOD;
+            status = PriceStatus.GOOD;
         } else if(inStock && price > targetPrice) {
-            status = PRICE_STATUS.OVERPRICED;
-        } else if(!inStock && price == 0) {
-            status = PRICE_STATUS.NO_DATA;
+            status = PriceStatus.OVERPRICED;
+        } else if(!inStock && price <= 0) {
+            status = PriceStatus.NO_DATA;
         } else {
-            status = PRICE_STATUS.OOS;
+            status = PriceStatus.OOS;
         }
 
         itemName.setText(cursor.getString(nomArticleIndex));
@@ -178,12 +177,12 @@ public class FollowedItemAdapter extends CursorAdapter {
 
         TextView productPrice = view.findViewById(R.id.price_text);
 
-        if(status == PRICE_STATUS.GOOD || status == PRICE_STATUS.OVERPRICED) {
+        if(status == PriceStatus.GOOD || status == PriceStatus.OVERPRICED) {
             String seeLink = lowestPriceLink;
             itemName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    activityEditListener.OpenLink(seeLink);
+                    activityInteractionListener.OpenLink(seeLink);
                 }
             });
 
@@ -192,22 +191,7 @@ public class FollowedItemAdapter extends CursorAdapter {
             itemName.setTextColor(context.getResources().getColor(R.color.dark_blue));
 
             productPrice.setVisibility(View.VISIBLE);
-            String priceTotal = String.valueOf((int)Math.floor(price));
-            String priceDecimalText = String.valueOf(price);
-
-            int dotIndex = priceDecimalText.indexOf(".");
-            if (dotIndex == -1) {
-                productPrice.setText(String.valueOf(price) + ".00$");
-            } else {
-                String decimal = priceDecimalText.substring(dotIndex + 1);
-                if (decimal.length() == 0) {
-                    productPrice.setText(priceTotal + ".00$");
-                } else if (decimal.length() == 1) {
-                    productPrice.setText(priceTotal + "." + decimal + "0$");
-                } else {
-                    productPrice.setText(priceTotal + "." + decimal + "$");
-                }
-            }
+            productPrice.setText(Utils.FormatPrice(price));
         } else {
             productPrice.setVisibility(View.GONE);
         }

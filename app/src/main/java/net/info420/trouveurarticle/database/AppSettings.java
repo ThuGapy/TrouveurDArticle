@@ -17,8 +17,8 @@ public class AppSettings {
     public static final boolean DefaultDisableRefreshBatteryLow = true;
     private static final String PREF_AUTOMATICALLY_REPLACE_PRODUCT_NAME = "automatically_replace_product_name";
     public static final boolean DefaultAutomaticallyReplaceProductName = true;
-    private static final String PREF_AUTOMATICALLY_REFRESH_HOME_SCREEN = "automatically_refresh_home_screen";
-    public static final boolean DefaultAutomaticallyRefreshHomeScreen = true;
+    private static final String PREF_AUTOMATICALLY_REFRESH_DATA = "automatically_refresh_data";
+    public static final boolean DefaultAutomaticallyRefreshData = true;
     public static final String PREF_OPTION_DENIED_AMOUNT = "time_dangerous_permission_denied";
 
     private SharedPreferences sharedPreferences;
@@ -76,11 +76,11 @@ public class AppSettings {
     }
 
     public boolean getAutomaticallyRefreshHomeScreen() {
-        return sharedPreferences.getBoolean(PREF_AUTOMATICALLY_REFRESH_HOME_SCREEN, DefaultAutomaticallyRefreshHomeScreen);
+        return sharedPreferences.getBoolean(PREF_AUTOMATICALLY_REFRESH_DATA, DefaultAutomaticallyRefreshData);
     }
 
     public void setAutomaticallyRefreshHomeScreen(boolean enabled) {
-        sharedPreferences.edit().putBoolean(PREF_AUTOMATICALLY_REFRESH_HOME_SCREEN, enabled).apply();
+        sharedPreferences.edit().putBoolean(PREF_AUTOMATICALLY_REFRESH_DATA, enabled).apply();
     }
 
     public int getPermissionDeniedAmount() {
@@ -98,6 +98,6 @@ public class AppSettings {
         sharedPreferences.edit().putBoolean(PREF_DISABLE_REFRESH_CELL_DATA, DefaultDisableRefreshCellData).apply();
         sharedPreferences.edit().putBoolean(PREF_DISABLE_REFRESH_BATTERY_LOW, DefaultDisableRefreshBatteryLow).apply();
         sharedPreferences.edit().putBoolean(PREF_AUTOMATICALLY_REPLACE_PRODUCT_NAME, DefaultAutomaticallyReplaceProductName).apply();
-        sharedPreferences.edit().putBoolean(PREF_AUTOMATICALLY_REFRESH_HOME_SCREEN, DefaultAutomaticallyRefreshHomeScreen).apply();
+        sharedPreferences.edit().putBoolean(PREF_AUTOMATICALLY_REFRESH_DATA, DefaultAutomaticallyRefreshData).apply();
     }
 }

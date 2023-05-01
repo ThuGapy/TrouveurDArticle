@@ -31,7 +31,6 @@ public class AmazonScrapper extends Scrapper{
             String stockText = stockElement.text();
             isInStock = stockText.toLowerCase().contains("in stock");
         } catch (NullPointerException e) {
-            System.out.println("Impossible d'obtenir le status de l'article");
             return null;
         }
 

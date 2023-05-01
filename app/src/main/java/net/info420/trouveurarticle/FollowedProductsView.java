@@ -16,7 +16,7 @@ import net.info420.trouveurarticle.database.AppSettings;
 import net.info420.trouveurarticle.database.DatabaseHelper;
 import net.info420.trouveurarticle.database.FollowedItemAdapter;
 import net.info420.trouveurarticle.views.OnRefreshRequestedListener;
-import net.info420.trouveurarticle.views.OnTriggerEditListener;
+import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
 public class FollowedProductsView extends Fragment implements OnRefreshRequestedListener {
     private View fragmentView;
@@ -67,7 +67,7 @@ public class FollowedProductsView extends Fragment implements OnRefreshRequested
 
     public void Refresh() {
         dataCursor = dbHelper.getAllItemsStockStatus();
-        itemAdapter = new FollowedItemAdapter(getActivity(), (OnTriggerEditListener) getActivity(), (OnRefreshRequestedListener) this);
+        itemAdapter = new FollowedItemAdapter(getActivity(), (OnProductInteractionListener) getActivity(), (OnRefreshRequestedListener) this);
         itemAdapter.changeCursor(dataCursor);
         ListView itemView = fragmentView.findViewById(R.id.item_listview);
         itemView.setAdapter(itemAdapter);

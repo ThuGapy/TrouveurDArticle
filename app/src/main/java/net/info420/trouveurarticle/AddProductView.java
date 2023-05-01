@@ -1,6 +1,5 @@
 package net.info420.trouveurarticle;
 
-import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 
@@ -26,9 +25,7 @@ import net.info420.trouveurarticle.scrappers.NeweggScrapper;
 import net.info420.trouveurarticle.scrappers.Scrapper;
 import net.info420.trouveurarticle.scrappers.StoreFront;
 import net.info420.trouveurarticle.views.AddProductButtonGroup;
-import net.info420.trouveurarticle.views.OnTriggerEditListener;
-
-import org.w3c.dom.Text;
+import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
 public class AddProductView extends Fragment {
     private View fragmentView;
@@ -157,7 +154,7 @@ public class AddProductView extends Fragment {
                                 dbHelper.updateItem(editId, stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
                                 ShowToast("Produit modifié");
 
-                                OnTriggerEditListener listener = (OnTriggerEditListener) getActivity();
+                                OnProductInteractionListener listener = (OnProductInteractionListener) getActivity();
                                 listener.EditDone();
                             } else {
                                 ShowToast("Impossible de modifier le produit");
@@ -222,7 +219,7 @@ public class AddProductView extends Fragment {
 
                             ShowToast("Produit ajouté");
 
-                            OnTriggerEditListener listener = (OnTriggerEditListener) getActivity();
+                            OnProductInteractionListener listener = (OnProductInteractionListener) getActivity();
                             listener.EditDone();
                         } else {
                             ShowToast("Impossible de modifier le produit");

@@ -14,7 +14,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -26,17 +25,12 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import net.info420.trouveurarticle.database.AppSettings;
-import net.info420.trouveurarticle.scrappers.AmazonScrapper;
-import net.info420.trouveurarticle.scrappers.CanadaComputersScrapper;
-import net.info420.trouveurarticle.scrappers.MemoryExpressScrapper;
-import net.info420.trouveurarticle.scrappers.NeweggScrapper;
-import net.info420.trouveurarticle.scrappers.ScrapperResult;
 import net.info420.trouveurarticle.scrappers.ScrappingService;
-import net.info420.trouveurarticle.views.OnTriggerEditListener;
+import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnTriggerEditListener {
+public class MainActivity extends AppCompatActivity implements OnProductInteractionListener {
 
     private static final int INTERNET_PERMISSION = 1;
     private static final int SETTINGS_PERMISSION = 2;
@@ -205,6 +199,13 @@ public class MainActivity extends AppCompatActivity implements OnTriggerEditList
         if(link.equals("")) return;
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(link));
+        startActivity(intent);
+    }
+
+    @Override
+    public void SeeChart(int ID) {
+        Intent intent = new Intent(this, ChartData.class);
+        intent.putExtra("productID", ID);
         startActivity(intent);
     }
 }

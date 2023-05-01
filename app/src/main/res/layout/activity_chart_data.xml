@@ -4,10 +4,60 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChartData"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".ChartData">
 
     <include
         layout="@layout/toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/product_name_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:text="Sony PlayStation 5"
+            android:textSize="24sp"
+            android:textStyle="bold"/>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/line_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/historique_disponibilite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Historique de disponibilité"
+            android:textSize="16sp" />
+
+        <ListView
+            android:id="@+id/historique"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:dividerHeight="16dp"
+            android:layout_marginTop="16dp"
+            android:divider="@android:color/transparent"/>
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:background="@color/light_gray"
+    android:foreground="@drawable/thin_border">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/color_indicator"
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            android:background="@color/displayerror_color"
+            android:clipToOutline="true"
+            android:elevation="2dp"
+            android:foreground="@drawable/thin_border"
+            android:outlineProvider="bounds"
+            android:padding="4dp" />
+
+        <TextView
+            android:id="@+id/item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:text="test"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:gravity="left|center_vertical" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/elapsed_time_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:text="Small Text"
+        android:textSize="10sp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
+        android:textColor="@color/medium_gray" />
+
+</RelativeLayout>
