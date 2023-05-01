@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -113,6 +114,9 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         viewPortHandler.setMinMaxScaleY(1f, 1f);
         viewPortHandler.setDragOffsetY(0f);
 
+        Legend legend = lineChart.getLegend();
+        legend.setTextSize(12f);
+
         LineData lineData = dbHelper.getLineData(ID);
 
         lineChart.setData(lineData);
@@ -121,7 +125,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         leftAxis.setDrawZeroLine(true);
         leftAxis.setZeroLineColor(Color.BLACK);
         leftAxis.setZeroLineWidth(1f);
-        leftAxis.setValueFormatter(new DollarFormatter());
+        leftAxis.setValueFormatter(new DollarFormatter(DollarFormatter.Axis.Y));
         lineChart.getAxisRight().setEnabled(false);
 
         double targetPrice = dbHelper.getTargetPrice(ID);
@@ -139,6 +143,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f);
         xAxis.setXOffset(0f);
+        xAxis.setTextSize(12f);
         xAxis.setValueFormatter(new DayOfWeekFormatter());
 
         lineChart.invalidate();

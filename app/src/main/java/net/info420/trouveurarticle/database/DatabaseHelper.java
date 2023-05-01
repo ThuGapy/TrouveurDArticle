@@ -339,7 +339,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         LineDataSet dataSet = new LineDataSet(entries, nom);
         dataSet.setColor(color);
-        dataSet.setValueFormatter(new DollarFormatter());
+        dataSet.setValueFormatter(new DollarFormatter(DollarFormatter.Axis.X));
         dataSet.setValueTextSize(12f);
         dataSet.setLineWidth(3f);
 
