@@ -6,22 +6,33 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.provider.ContactsContract;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+
+import net.info420.trouveurarticle.Utils;
 import net.info420.trouveurarticle.scrappers.AmazonScrapper;
 import net.info420.trouveurarticle.scrappers.CanadaComputersScrapper;
 import net.info420.trouveurarticle.scrappers.MemoryExpressScrapper;
 import net.info420.trouveurarticle.scrappers.NeweggScrapper;
+import net.info420.trouveurarticle.scrappers.Scrapper;
 import net.info420.trouveurarticle.scrappers.ScrapperResult;
 import net.info420.trouveurarticle.scrappers.StoreFront;
 
 import java.sql.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -104,6 +115,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
 
         return cursor;
+    }
+
+    public String getProductName(int ID) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT nomArticle FROM produits WHERE id = " + ID;
+        Cursor cursor = db.rawQuery(query, null);
+        cursor.moveToFirst();
+
+        try {
+            return cursor.getString(cursor.getColumnIndexOrThrow("nomArticle"));
+        } catch(IllegalArgumentException ex) {
+            return "";
+        }
     }
 
     public Cursor getLatestLinkData(String link) {
@@ -228,6 +253,138 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             return null;
         }
+    }
+
+    public double getTargetPrice(int ID) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT prix FROM produits WHERE id = " + ID;
+        Cursor cursor = db.rawQuery(query, null);
+        if(cursor.moveToFirst()) {
+            try {
+                return cursor.getDouble(cursor.getColumnIndexOrThrow("prix"));
+            } catch (IllegalArgumentException ex) {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    public boolean hasScrapeData(String link) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT COUNT(*) as count FROM scrape_results WHERE link = '" + link + "'";
+        Cursor cursor = db.rawQuery(query, null);
+        cursor.moveToFirst();
+
+        boolean result;
+
+        try {
+            result = cursor.getInt(cursor.getColumnIndexOrThrow("count")) > 0;
+        } catch(IllegalArgumentException ex) {
+            result = false;
+        }
+
+        cursor.close();
+        return result;
+    }
+
+    public ScrapperResult getStartOfDayResult(String link, Date date) {
+        Calendar calendar = Utils.GetStartOfDayCalendar(date);
+        long startOfDayTimestamp = calendar.getTimeInMillis();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        long endOfDayTimestamp = calendar.getTimeInMillis();
+
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT id, instock, prix FROM scrape_results WHERE link = ? AND (strftime('%s', temps) >= strftime('%s', ?) AND strftime('%s', temps) < strftime('%s', ?)) ORDER BY id ASC LIMIT 1";
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String startOfDayString = sdf.format(new Date(startOfDayTimestamp));
+        String endOfDayString = sdf.format(new Date(endOfDayTimestamp));
+
+        Cursor cursor = db.rawQuery(query, new String[]{link, startOfDayString, endOfDayString});
+
+        ScrapperResult result = null;
+        if(cursor.moveToFirst()) {
+            System.out.println("moved to first");
+            result = new ScrapperResult(cursor.getInt(cursor.getColumnIndexOrThrow("instock")) == 1, cursor.getDouble(cursor.getColumnIndexOrThrow("prix")));
+        } else {
+            System.out.println("nothing found");
+        }
+
+        cursor.close();
+        return result;
+    }
+
+    public LineDataSet getLineDataSet(String link, String nom, int color) {
+        List<Entry> entries = new ArrayList<>();
+        Calendar currentCalendar = Utils.GetStartOfDayCalendar(new Date());
+        currentCalendar.add(Calendar.DAY_OF_YEAR, -7);
+        for (int i = 0; i < 7; i++) {
+            currentCalendar.add(Calendar.DAY_OF_YEAR, 1);
+
+            ScrapperResult startOfDayResult = getStartOfDayResult(link, currentCalendar.getTime());
+
+            if(startOfDayResult == null) {
+                if(i == 0) {
+                    entries.add(new Entry(i, 0));
+                } else {
+                    entries.add(new Entry(i, entries.get(i - 1).getY()));
+                }
+            } else {
+                entries.add(new Entry(i, (float)startOfDayResult.Prix));
+            }
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, nom);
+        dataSet.setColor(color);
+
+        return dataSet;
+    }
+
+
+    public LineData getLineData(int ID) {
+        Cursor item = getItem(ID);
+        String amazonLink = item.getString(item.getColumnIndexOrThrow("amazon"));
+        String neweggLink = item.getString(item.getColumnIndexOrThrow("newegg"));
+        String canadaComputersLink = item.getString(item.getColumnIndexOrThrow("canadacomputers"));
+        String memoryExpressLink = item.getString(item.getColumnIndexOrThrow("memoryexpress"));
+
+        List<ILineDataSet> dataSets = new ArrayList<>();
+
+        if(amazonLink != null) {
+            if(!amazonLink.equals("")) {
+                if(hasScrapeData(amazonLink)) {
+                    dataSets.add(getLineDataSet(amazonLink, "Amazon", Color.BLUE));
+                }
+            }
+        }
+        if(neweggLink != null) {
+            if(!neweggLink.equals("")) {
+                if(hasScrapeData(neweggLink)) {
+                    dataSets.add(getLineDataSet(neweggLink, "Newegg", Color.RED));
+                }
+            }
+        }
+
+        if(canadaComputersLink != null) {
+            if(!canadaComputersLink.equals("")) {
+                if(hasScrapeData(canadaComputersLink)) {
+                    dataSets.add(getLineDataSet(canadaComputersLink, "CanadaComputers", Color.YELLOW));
+                }
+            }
+        }
+
+        if(memoryExpressLink != null) {
+            if(!memoryExpressLink.equals("")) {
+                if(hasScrapeData(memoryExpressLink)) {
+                    dataSets.add(getLineDataSet(memoryExpressLink, "MemoryExpress", Color.MAGENTA));
+                }
+            }
+        }
+
+        LineData lineData = new LineData(dataSets);
+        return lineData;
     }
 
     public void createNewItem(String productName, String amazon, String newegg, String canadacomputers, String memoryexpress, double prix) {

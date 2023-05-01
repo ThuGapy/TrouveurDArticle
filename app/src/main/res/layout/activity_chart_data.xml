@@ -24,14 +24,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
-            android:text="Sony PlayStation 5"
-            android:textSize="24sp"
-            android:textStyle="bold"/>
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:ellipsize="end"
+            android:maxLines="2"/>
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/line_chart"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"/>
 
     </LinearLayout>
 
@@ -48,6 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Historique de disponibilité"
+            android:textStyle="bold"
             android:textSize="16sp" />
 
         <ListView
@@ -55,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:dividerHeight="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:divider="@android:color/transparent"/>
 
     </LinearLayout>
