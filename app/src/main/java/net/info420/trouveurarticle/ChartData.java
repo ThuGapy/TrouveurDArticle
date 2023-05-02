@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ import net.info420.trouveurarticle.database.PriceHistoryAdapter;
 import net.info420.trouveurarticle.scrappers.ScrappingService;
 import net.info420.trouveurarticle.views.OnProductInteractionListener;
 import net.info420.trouveurarticle.views.OnRefreshRequestedListener;
+import net.info420.trouveurarticle.views.graphs.Axis;
 import net.info420.trouveurarticle.views.graphs.DayOfWeekFormatter;
 import net.info420.trouveurarticle.views.graphs.DollarFormatter;
 
@@ -49,6 +51,8 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
     private PriceHistoryAdapter adapter;
     private int ID;
     private AppSettings preferences;
+    private Handler refreshHandler;
+    private Runnable refreshRunnable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,10 +125,10 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         layoutParams.setMarginStart((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics()));
 
         TextView toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Trouveur d'articles");
+        toolbarTitle.setText(Utils.getResourceString(getApplicationContext(), R.string.app_name));
 
         TextView toolbarSubtitle = findViewById(R.id.toolbar_subtitle);
-        toolbarSubtitle.setText("Suivi du status de l'article!");
+        toolbarSubtitle.setText(Utils.getResourceString(getApplicationContext(), R.string.suivi_du_status_de_larticle));
 
         setSupportActionBar(toolbar);
 
@@ -138,6 +142,28 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
             productNameTitle.setText(productName);
 
             Refresh();
+
+            if(preferences.getAutomaticallyRefreshData()) {
+                refreshHandler = new Handler();
+                refreshRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        Refresh();
+                        refreshHandler.postDelayed(this, 10000);
+                    }
+                };
+
+                refreshHandler.postDelayed(refreshRunnable, 10000);
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (refreshHandler != null && refreshRunnable != null) {
+            refreshHandler.removeCallbacks(refreshRunnable);
         }
     }
 
@@ -167,11 +193,11 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         leftAxis.setDrawZeroLine(true);
         leftAxis.setZeroLineColor(Color.BLACK);
         leftAxis.setZeroLineWidth(1f);
-        leftAxis.setValueFormatter(new DollarFormatter(DollarFormatter.Axis.Y));
+        leftAxis.setValueFormatter(new DollarFormatter(Axis.Y));
         lineChart.getAxisRight().setEnabled(false);
 
         double targetPrice = dbHelper.getTargetPrice(ID);
-        LimitLine targetLine = new LimitLine((float)targetPrice, "Prix désiré");
+        LimitLine targetLine = new LimitLine((float)targetPrice, Utils.getResourceString(getApplicationContext(), R.string.prix_desire));
         targetLine.setLineColor(Color.BLACK);
         targetLine.setLineWidth(1f);
         targetLine.setTextColor(Color.BLACK);

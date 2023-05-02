@@ -93,9 +93,9 @@ public class FollowedItemAdapter extends CursorAdapter {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Êtes vous certain de vouloir supprimer l'item: " + elementName + "?");
-                builder.setTitle("Confirmation");
-                builder.setPositiveButton("Confirmer", new DialogInterface.OnClickListener() {
+                builder.setMessage(String.format(Utils.getResourceString(context, R.string.etes_vous_certain_de_vouloir_supprimer_le_produit), elementName));
+                builder.setTitle(Utils.getResourceString(context, R.string.confirmation));
+                builder.setPositiveButton(Utils.getResourceString(context, R.string.confirmer), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dbHelper = new DatabaseHelper(context);
@@ -106,7 +106,7 @@ public class FollowedItemAdapter extends CursorAdapter {
                     }
                 });
 
-                builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(Utils.getResourceString(context, R.string.annuler), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();

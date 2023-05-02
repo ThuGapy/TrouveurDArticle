@@ -17,8 +17,18 @@ public class CanadaComputersScrapper extends Scrapper{
         Element priceElement = document.selectFirst("span.h2-big > strong");
         if(priceElement != null) {
             String priceText = priceElement.text();
-            price = Double.parseDouble(priceText.replace("$", "").replace(",", ""));
+            try {
+                price = Double.parseDouble(priceText.replace("$", "").replace(",", ""));
+            } catch(NumberFormatException ex) {
+                try {
+                    price = Double.parseDouble(priceText.replace("$", "").replace(" ", ""));
+                } catch (NumberFormatException ex2) {}
+            }
         } else {
+            return null;
+        }
+
+        if(price == 0) {
             return null;
         }
 

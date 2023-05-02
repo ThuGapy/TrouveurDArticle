@@ -37,7 +37,7 @@ public class Utils {
 
         int dotIndex = priceDecimalText.indexOf(".");
         if (dotIndex == -1) {
-            return "$" + String.valueOf(price) + ".00";
+            return "$" + price + ".00";
         } else {
             String decimal = priceDecimalText.substring(dotIndex + 1);
             if (decimal.length() == 0) {
@@ -86,7 +86,7 @@ public class Utils {
                     Intent stopServiceIntent = new Intent(context, ScrappingService.class);
                     context.stopService(stopServiceIntent);
 
-                    System.out.println("Stopped Scrapping Service");
+                    System.out.println("Service de suivi arrêté");
                 }
             }
         }
@@ -121,9 +121,9 @@ public class Utils {
 
     public static void ShowPermissionReason(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage("Cette application a besoin d'une permission pour ouvrir la page d'options. Allez dans les paramètres de l'application pour l'activer.")
-                .setPositiveButton("Ouvrir les paramètres", (dialog, which) -> OpenAppSettings(context))
-                .setNegativeButton("Annuler", (dialog, which) -> dialog.dismiss())
+        builder.setMessage(Utils.getResourceString(context, R.string.cette_application_besoin_permission))
+                .setPositiveButton(Utils.getResourceString(context, R.string.ouvrir_les_parametres), (dialog, which) -> OpenAppSettings(context))
+                .setNegativeButton(Utils.getResourceString(context, R.string.annuler), (dialog, which) -> dialog.dismiss())
                 .create()
                 .show();
     }
@@ -147,7 +147,7 @@ public class Utils {
 
         String channelId = "scrape_result_channel";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence channelName = "Canal du trouveur d'article";
+            CharSequence channelName = Utils.getResourceString(context, R.string.canal_trouveur_article);
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
             channel.enableVibration(true);
@@ -163,5 +163,9 @@ public class Utils {
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
 
         notificationManager.notify(preferences.createNewNotification(), builder.build());
+    }
+
+    public static String getResourceString(Context context, int stringID) {
+        return context.getResources().getString(stringID);
     }
 }

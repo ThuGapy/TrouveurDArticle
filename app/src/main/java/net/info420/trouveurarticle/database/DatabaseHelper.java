@@ -17,6 +17,7 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
+import net.info420.trouveurarticle.R;
 import net.info420.trouveurarticle.Utils;
 import net.info420.trouveurarticle.scrappers.AmazonScrapper;
 import net.info420.trouveurarticle.scrappers.CanadaComputersScrapper;
@@ -25,6 +26,7 @@ import net.info420.trouveurarticle.scrappers.NeweggScrapper;
 import net.info420.trouveurarticle.scrappers.Scrapper;
 import net.info420.trouveurarticle.scrappers.ScrapperResult;
 import net.info420.trouveurarticle.scrappers.StoreFront;
+import net.info420.trouveurarticle.views.graphs.Axis;
 import net.info420.trouveurarticle.views.graphs.DollarFormatter;
 
 import java.sql.Array;
@@ -347,7 +349,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         LineDataSet dataSet = new LineDataSet(entries, nom);
         dataSet.setColor(color);
-        dataSet.setValueFormatter(new DollarFormatter(DollarFormatter.Axis.X));
+        dataSet.setValueFormatter(new DollarFormatter(Axis.X));
         dataSet.setValueTextSize(12f);
         dataSet.setLineWidth(3f);
 
@@ -442,20 +444,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             if(result.EnStock) {
                 String title = "";
-                String description = "Le produit " + productName + " est maintenant disponible au prix de " + Utils.FormatPrice(result.Prix);
+                String description = String.format(Utils.getResourceString(context, R.string.produit_est_disponible_au_prix_de), productName, Utils.FormatPrice(result.Prix));
 
                 switch (storeFront) {
                     case Amazon:
-                        title = "Suivi de produit Amazon";
+                        title = Utils.getResourceString(context, R.string.suivi_de_produit_amazon);
                         break;
                     case Newegg:
-                        title = "Suivi de produit Newegg";
+                        title = Utils.getResourceString(context, R.string.suivi_de_produit_newegg);
                         break;
                     case CanadaComputers:
-                        title = "Suivi de produit CanadaComputers";
+                        title = Utils.getResourceString(context, R.string.suivi_de_produit_canadacomputers);
                         break;
                     case MemoryExpress:
-                        title = "Suivi de projet MemoryExpress";
+                        title = Utils.getResourceString(context, R.string.suivi_de_produit_memoryexpress);
                         break;
                 }
 

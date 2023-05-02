@@ -1,6 +1,5 @@
 package net.info420.trouveurarticle;
 
-import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -50,7 +49,7 @@ public class FollowedProductsView extends Fragment implements OnRefreshRequested
             }
         });
 
-        if(preferences.getAutomaticallyRefreshHomeScreen()) {
+        if(preferences.getAutomaticallyRefreshData()) {
             refreshHandler = new Handler();
             refreshRunnable = new Runnable() {
                 @Override

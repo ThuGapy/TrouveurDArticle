@@ -22,7 +22,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Temps entre les rafraichissements" />
+            android:text="@string/temps_entre_les_rafraichissements" />
 
         <EditText
             android:id="@+id/refresh_time"
@@ -42,7 +42,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Temps entre les rafraichissements lorsque le téléphone utilise des données cellulaire" />
+            android:text="@string/temps_entre_les_rafraichissements_cell" />
 
         <EditText
             android:id="@+id/refresh_time_cell_data"
@@ -62,7 +62,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Temps entre les rafraichissements lorsque le téléphone est branché" />
+            android:text="@string/temps_entre_les_rafraichissements_plugged" />
 
         <EditText
             android:id="@+id/refresh_time_cell_plugged_in"
@@ -84,7 +84,7 @@
             android:layout_marginBottom="4dp"
             android:layoutDirection="rtl"
             android:textColor="@color/black"
-            android:text="Désactiver le rafraichissement lors d'utilisation de données cellulaires" />
+            android:text="@string/d_sactiver_le_rafraichissement_cell" />
 
         <CheckBox
             android:id="@+id/disable_refresh_battery_low"
@@ -96,7 +96,7 @@
             android:layout_marginBottom="4dp"
             android:layoutDirection="rtl"
             android:textColor="@color/black"
-            android:text="Désactiver le rafraichissement lorsque la batterie est faible (20% et moins)" />
+            android:text="@string/d_sactiver_le_rafraichissement_low_battery" />
 
         <CheckBox
             android:id="@+id/automatically_replace_product_name"
@@ -108,7 +108,7 @@
             android:layout_marginBottom="4dp"
             android:layoutDirection="rtl"
             android:textColor="@color/black"
-            android:text="Remplacer automatiquement le nom du produit par celui de la page web" />
+            android:text="@string/remplacer_automatiquement_le_nom_du_produit" />
 
         <CheckBox
             android:id="@+id/automatically_refresh_home_screen"
@@ -120,7 +120,7 @@
             android:layout_marginBottom="4dp"
             android:layoutDirection="rtl"
             android:textColor="@color/black"
-            android:text="Automatiquement rafraichir la page d'accueil chaque 10 secondes" />
+            android:text="@string/automatiquement_rafraichir_la_page_d_accueil" />
 
         <Button
             android:id="@+id/give_notifications_permission"
@@ -130,7 +130,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
-            android:text="Donner les permissions de notifications"
+            android:text="@string/donner_les_permissions_de_notifications"
             android:onClick="GiveNotificationsPermission" />
 
         <Button
@@ -140,7 +140,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
-            android:text="Supprimer les données des pages de produits"
+            android:text="@string/supprimer_les_donn_es_des_pages_de_produits"
             android:onClick="DeleteScrapeResults" />
     </LinearLayout>
 
@@ -161,8 +161,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginRight="8dp"
-            android:text="Retour"
+            android:layout_marginEnd="8dp"
+            android:text="@string/retour"
             android:onClick="Retour"/>
 
         <Button
@@ -170,8 +170,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginLeft="8dp"
-            android:text="Sauvegarder"
+            android:layout_marginStart="8dp"
+            android:text="@string/sauvegarder"
             android:onClick="Sauvegarder" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

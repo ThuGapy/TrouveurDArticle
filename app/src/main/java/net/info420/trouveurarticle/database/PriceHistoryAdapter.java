@@ -50,11 +50,11 @@ public class PriceHistoryAdapter extends ArrayAdapter<LinkStatus> {
                 colorIndicator.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.overpriced_color));
                 break;
             case OOS:
-                nameSuffix = " (" + "Rupture de stock" + ")";
+                nameSuffix = " (" + Utils.getResourceString(getContext(), R.string.rupture_de_stock) + ")";
                 colorIndicator.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.oos_color));
                 break;
             case NO_DATA:
-                nameSuffix = " (" + "Aucune données" + ")";
+                nameSuffix = " (" + Utils.getResourceString(getContext(), R.string.aucune_donnees) + ")";
                 colorIndicator.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.displayerror_color));
                 break;
         }

@@ -1,6 +1,5 @@
 package net.info420.trouveurarticle;
 
-import static net.info420.trouveurarticle.database.AppSettings.INTERNET_PERMISSION;
 import static net.info420.trouveurarticle.database.AppSettings.SETTINGS_PERMISSION;
 
 import androidx.annotation.NonNull;
@@ -42,9 +41,9 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
         setSupportActionBar(toolbar);
 
         TextView toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Trouveur d'articles");
+        toolbarTitle.setText(Utils.getResourceString(getApplicationContext(), R.string.app_name));
         TextView toolbarSubtitle = toolbar.findViewById(R.id.toolbar_subtitle);
-        toolbarSubtitle.setText("Trouvez les articles en demande!");
+        toolbarSubtitle.setText(Utils.getResourceString(getApplicationContext(), R.string.trouvez_les_articles_en_demande));
 
         ImageButton settingsButton = findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(new View.OnClickListener() {
@@ -104,18 +103,9 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
                         .replace(R.id.fragment_container, fragment)
                         .commit();
 
-                System.out.println("changing fragment");
                 return true;
             }
         });
-
-        ValiderPermissions();
-    }
-
-    private void ValiderPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, INTERNET_PERMISSION);
-        }
     }
 
     private void Settings(View view) {
@@ -131,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
                 Settings(null);
             } else {
                 preferences.addPermissionDeniedAmount();
-                Toast.makeText(this, "Impossible d'aller dans les options. Vous devez donner la permission à l'application", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, Utils.getResourceString(getApplicationContext(), R.string.impossible_aller_dans_les_options), Toast.LENGTH_SHORT).show();
             }
         }
     }

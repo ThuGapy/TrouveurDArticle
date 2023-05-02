@@ -99,7 +99,7 @@ public class AddProductView extends Fragment {
         if(editMode) {
             CursorWrapper wrapper = dbHelper.getItem(editId);
 
-            addProductTextView.setText("Modification d'un produit");
+            addProductTextView.setText(Utils.getResourceString(getContext(), R.string.modification_un_produit));
             addButton.setVisibility(View.GONE);
             clearButton.setVisibility(View.GONE);
             modifyButton.setVisibility(View.VISIBLE);
@@ -136,17 +136,17 @@ public class AddProductView extends Fragment {
                                     if(!TextUtils.isEmpty(fetchedString)) {
                                         stringToAdd = fetchedString;
                                     } else {
-                                        ShowToast("Impossible d'obtenir le nom automatiquemen");
+                                        ShowToast(Utils.getResourceString(getContext(), R.string.impossible_obtenir_le_nom_automatiquement));
                                     }
                                 }
 
                                 dbHelper.updateItem(editId, stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
-                                ShowToast("Produit modifié");
+                                ShowToast(Utils.getResourceString(getContext(), R.string.produit_modifie));
 
                                 OnProductInteractionListener listener = (OnProductInteractionListener) getActivity();
                                 listener.EditDone();
                             } else {
-                                ShowToast("Impossible de modifier le produit");
+                                ShowToast(Utils.getResourceString(getContext(), R.string.impossible_de_modifier_le_produit));
                             }
                         }
                     }).start();
@@ -189,18 +189,18 @@ public class AddProductView extends Fragment {
                                 if(!TextUtils.isEmpty(fetchedString)) {
                                     stringToAdd = fetchedString;
                                 } else {
-                                    ShowToast("Impossible d'obtenir le nom automatiquemen");
+                                    ShowToast(Utils.getResourceString(getContext(), R.string.impossible_obtenir_le_nom_automatiquement));
                                 }
                             }
 
                             dbHelper.createNewItem(stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
 
-                            ShowToast("Produit ajouté");
+                            ShowToast(Utils.getResourceString(getContext(), R.string.produit_ajoute));
 
                             OnProductInteractionListener listener = (OnProductInteractionListener) getActivity();
                             listener.EditDone();
                         } else {
-                            ShowToast("Impossible de modifier le produit");
+                            ShowToast(Utils.getResourceString(getContext(), R.string.impossible_ajouter_le_produit));
                         }
                     }
                 }).start();

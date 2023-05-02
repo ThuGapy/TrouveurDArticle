@@ -3,22 +3,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_options"
-        android:title="Options"
+        android:title="@string/options"
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_start_scrapping"
-        android:title="Lancer le service de suivi"
+        android:title="@string/lancer_le_service_de_suivi"
         android:orderInCategory="200"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_stop_scrapping"
-        android:title="Arrêter le service de suivi"
+        android:title="@string/arr_ter_le_service_de_suivi"
         android:orderInCategory="300"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_refresh_graph"
-        android:title="Rafraichir les données"
+        android:title="@string/rafraichir_les_donnees"
         android:orderInCategory="300"
         android:visible="false"
         app:showAsAction="never" />

@@ -38,9 +38,9 @@ public class Settings extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         TextView toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
-        toolbarTitle.setText("Options");
+        toolbarTitle.setText(Utils.getResourceString(getApplicationContext(), R.string.options));
         TextView toolbarSubtitle = toolbar.findViewById(R.id.toolbar_subtitle);
-        toolbarSubtitle.setText("Changez les paramètres de l'application!");
+        toolbarSubtitle.setText(Utils.getResourceString(getApplicationContext(), R.string.changer_les_parametres_de_lapplication));
 
         ImageButton resetSettingsButton = toolbar.findViewById(R.id.reset_settings_button);
         resetSettingsButton.setOnClickListener(new View.OnClickListener() {
@@ -82,18 +82,18 @@ public class Settings extends AppCompatActivity {
 
     public void DeleteScrapeResults(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Êtes vous certain de vouloir supprimer les données des pages de produits?");
-        builder.setTitle("Confirmation");
-        builder.setPositiveButton("Confirmer", new DialogInterface.OnClickListener() {
+        builder.setMessage(Utils.getResourceString(getApplicationContext(), R.string.etes_vous_certain_de_vouloir_supprimer_le_produit));
+        builder.setTitle(Utils.getResourceString(getApplicationContext(), R.string.confirmation));
+        builder.setPositiveButton(Utils.getResourceString(getApplicationContext(), R.string.confirmer), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 DatabaseHelper dbHelper = new DatabaseHelper(getApplicationContext());
                 dbHelper.deleteAllScrapeResults();
-                Toast.makeText(getApplicationContext(), "Données des pages de produits supprimés", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), Utils.getResourceString(getApplicationContext(), R.string.donnees_des_pages_de_produits_supprimes), Toast.LENGTH_LONG).show();
             }
         });
 
-        builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(Utils.getResourceString(getApplicationContext(), R.string.annuler), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -118,9 +118,9 @@ public class Settings extends AppCompatActivity {
 
     public void Reset(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Êtes vous certain de vouloir réinitialiser les paramètres de l'application?");
-        builder.setTitle("Confirmation");
-        builder.setPositiveButton("Confirmer", new DialogInterface.OnClickListener() {
+        builder.setMessage(Utils.getResourceString(getApplicationContext(), R.string.etes_vous_certain_reinitialiser_parametres_application));
+        builder.setTitle(Utils.getResourceString(getApplicationContext(), R.string.confirmation));
+        builder.setPositiveButton(Utils.getResourceString(getApplicationContext(), R.string.confirmer), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 settings.ResetSettings();
@@ -128,7 +128,7 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-        builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(Utils.getResourceString(getApplicationContext(), R.string.annuler), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -154,9 +154,9 @@ public class Settings extends AppCompatActivity {
         settings.setDisableRefreshCellData(disableRefreshCellData.isChecked());
         settings.setDisableRefreshBatteryLow(disableRefreshBatteryLow.isChecked());
         settings.setAutomaticallyReplaceProductName(enableAutomaticProductName.isChecked());
-        settings.setAutomaticallyRefreshHomeScreen(enableAutomaticHomePageRefresh.isChecked());
+        settings.setAutomaticallyRefreshData(enableAutomaticHomePageRefresh.isChecked());
 
-        Toast.makeText(this, "Les paramètres sont sauvegardés", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, Utils.getResourceString(getApplicationContext(), R.string.parametres_sauvegardes), Toast.LENGTH_LONG).show();
     }
 
     public void UpdateEntryData() {
@@ -174,6 +174,6 @@ public class Settings extends AppCompatActivity {
         disableRefreshCellData.setChecked(settings.getDisableRefreshCellData());
         disableRefreshBatteryLow.setChecked(settings.getDisableRefreshBatteryLow());
         enableAutomaticProductName.setChecked(settings.getAutomaticallyReplaceProductName());
-        enableAutomaticHomePageRefresh.setChecked(settings.getAutomaticallyRefreshHomeScreen());
+        enableAutomaticHomePageRefresh.setChecked(settings.getAutomaticallyRefreshData());
     }
 }

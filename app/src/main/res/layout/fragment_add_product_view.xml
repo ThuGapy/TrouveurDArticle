@@ -22,9 +22,9 @@
             android:layout_marginBottom="4dp"
             android:textSize="24sp"
             android:textColor="@color/black"
-            android:text="Ajouter un produit" />
+            android:text="@string/ajouter_un_produit" />
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
@@ -32,7 +32,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Nom du produit" />
+            android:text="@string/nom_du_produit" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,7 +46,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginRight="4dp"
+                android:layout_marginEnd="4dp"
                 android:inputType="text"
                 android:singleLine="true"
                 android:background="@drawable/border"/>
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:contentDescription="Vider"
+                android:contentDescription="@string/vider"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 app:tint="@color/black" />
         </LinearLayout>
@@ -69,7 +69,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Lien Amazon.ca" />
+            android:text="@string/lien_amazon_ca" />
 
         <net.info420.trouveurarticle.views.AddProductButtonGroup
             android:id="@+id/amazon_button_group"
@@ -84,7 +84,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Lien Newegg.ca" />
+            android:text="@string/lien_newegg_ca" />
 
         <net.info420.trouveurarticle.views.AddProductButtonGroup
             android:id="@+id/newegg_button_group"
@@ -99,7 +99,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Lien CanadaComputers.com" />
+            android:text="@string/lien_canadacomputers_com" />
 
         <net.info420.trouveurarticle.views.AddProductButtonGroup
             android:id="@+id/canada_computers_button_group"
@@ -114,7 +114,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Lien MemoryExpress.com" />
+            android:text="@string/lien_memoryexpress_com" />
 
         <net.info420.trouveurarticle.views.AddProductButtonGroup
             android:id="@+id/memory_express_button_group"
@@ -129,7 +129,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginBottom="4dp"
             android:textColor="@color/black"
-            android:text="Prix désiré" />
+            android:text="@string/prix_desire" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -143,7 +143,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginRight="4dp"
+                android:layout_marginEnd="4dp"
                 android:inputType="numberDecimal"
                 android:singleLine="true"
                 android:background="@drawable/border"/>
@@ -153,7 +153,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:contentDescription="Vider"
+                android:contentDescription="@string/vider"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 app:tint="@color/black" />
         </LinearLayout>
@@ -176,23 +176,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginRight="8dp"
-            android:text="Réinitialiser" />
+            android:layout_marginEnd="8dp"
+            android:text="@string/reinitialiser" />
 
         <Button
             android:id="@+id/add_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginLeft="8dp"
-            android:text="Ajouter le produit" />
+            android:layout_marginStart="8dp"
+            android:text="@string/ajouter_le_produit" />
 
         <Button
             android:id="@+id/save_changes_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Modifier"
+            android:text="@string/modifier"
             android:visibility="gone"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

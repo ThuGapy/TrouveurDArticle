@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import net.info420.trouveurarticle.R;
+import net.info420.trouveurarticle.Utils;
 import net.info420.trouveurarticle.scrappers.AmazonScrapper;
 import net.info420.trouveurarticle.scrappers.CanadaComputersScrapper;
 import net.info420.trouveurarticle.scrappers.MemoryExpressScrapper;
@@ -145,7 +146,7 @@ public class AddProductButtonGroup extends LinearLayout {
                             if(isUrlValid) {
                                 getEditText().setText(currentUrl);
                             } else {
-                                Toast.makeText(context, "URL invalide", Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, Utils.getResourceString(context, R.string.url_invalide), Toast.LENGTH_LONG).show();
                             }
 
                             productNameText.setFocusableInTouchMode(true);

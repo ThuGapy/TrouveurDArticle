@@ -24,16 +24,15 @@
 
         <TextView
             android:id="@+id/item_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ellipsize="end"
             android:textSize="18sp"
             android:textColor="@color/black"
-            android:text="test"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:gravity="left|center_vertical" />
+            android:gravity="start|center_vertical" />
 
     </LinearLayout>
 
@@ -43,9 +42,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:text="Small Text"
         android:textSize="10sp"
-        android:layout_marginRight="4dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginBottom="4dp"
         android:textColor="@color/medium_gray" />
 

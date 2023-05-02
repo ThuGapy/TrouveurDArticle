@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -15,6 +16,7 @@ import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 
 import net.info420.trouveurarticle.R;
+import net.info420.trouveurarticle.Utils;
 import net.info420.trouveurarticle.database.AppSettings;
 import net.info420.trouveurarticle.database.CursorWrapper;
 import net.info420.trouveurarticle.database.DatabaseHelper;
@@ -38,8 +40,8 @@ public class ScrappingService extends Service {
         preferences = new AppSettings(getApplicationContext());
         serviceHandler = new Handler();
 
-        CreateNotificationChannel();
-        startForeground(1, CreateNotification());
+        CreateNotificationChannel(getApplicationContext());
+        startForeground(1, CreateNotification(getApplicationContext()));
 
         IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_LOW);
         receiver = new LowBatteryReceiver();
@@ -75,7 +77,7 @@ public class ScrappingService extends Service {
         serviceRunnable = new Runnable() {
             @Override
             public void run() {
-                System.out.println("Running scrapping service");
+                System.out.println("Service de suivi en cours");
                 int previousInterval = currentInterval;
                 GetShouldBeInterval();
 
@@ -179,7 +181,7 @@ public class ScrappingService extends Service {
         serviceRunnable = new Runnable() {
             @Override
             public void run() {
-                System.out.println("Pending service running");
+                System.out.println("Service d'attente en cours");
                 GetShouldBeInterval();
 
                 if(shouldFetchData) {
@@ -228,10 +230,10 @@ public class ScrappingService extends Service {
         shouldFetchData = interval != 0;
     }
 
-    private void CreateNotificationChannel() {
+    private void CreateNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Service de suivi";
-            String description = "Service d'avant-plan pour le suivi des articles";
+            CharSequence name = Utils.getResourceString(context, R.string.service_de_suivi);
+            String description = Utils.getResourceString(context, R.string.service_foreground_suivi);
             int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel("scrapping_foreground_channel", name, importance);
             channel.setDescription(description);
@@ -244,10 +246,10 @@ public class ScrappingService extends Service {
         }
     }
 
-    private Notification CreateNotification() {
+    private Notification CreateNotification(Context context) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "scrapping_foreground_channel")
-                .setContentTitle("Service de suivi")
-                .setContentText("Suivi de vos produits...")
+                .setContentTitle(Utils.getResourceString(context, R.string.service_de_suivi))
+                .setContentText(Utils.getResourceString(context, R.string.suivi_de_vos_produits))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
