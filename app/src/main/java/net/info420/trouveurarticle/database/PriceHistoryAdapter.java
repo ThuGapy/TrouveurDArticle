@@ -90,12 +90,9 @@ public class PriceHistoryAdapter extends ArrayAdapter<LinkStatus> {
         }
 
         TextView elapsedTime = newView.findViewById(R.id.elapsed_time_text);
-        System.out.println(status.getElapsedTime());
         if(status.getStatus() != PriceStatus.NO_DATA) {
-            System.out.println("updating elapsed time");
             elapsedTime.setText(status.getElapsedTime());
         } else {
-            System.out.println("gone");
             elapsedTime.setVisibility(View.GONE);
         }
 

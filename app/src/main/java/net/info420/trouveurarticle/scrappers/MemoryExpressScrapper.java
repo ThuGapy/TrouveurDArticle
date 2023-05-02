@@ -35,9 +35,11 @@ public class MemoryExpressScrapper extends Scrapper{
     @Override
     public String FetchProductName(Document document) {
         Element productNameElement = document.selectFirst("header.c-capr-header > h1");
-        if(productNameElement != null) {
-            return productNameElement.text().trim();
-        }
+        try {
+            if (productNameElement != null) {
+                return productNameElement.text().trim();
+            }
+        } catch(NullPointerException ex) {}
         return null;
     }
 }

@@ -80,6 +80,9 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
 
                 MenuItem startScrappingItem = popupMenu.getMenu().findItem(R.id.action_start_scrapping);
                 MenuItem stopScrappingItem = popupMenu.getMenu().findItem(R.id.action_stop_scrapping);
+                MenuItem refreshGraph = popupMenu.getMenu().findItem(R.id.action_refresh_graph);
+
+                refreshGraph.setVisible(true);
 
                 if(Utils.IsScrappingServiceRunning(getApplicationContext())) {
                     startScrappingItem.setEnabled(false);
@@ -100,6 +103,10 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
                             return true;
                         } else if(itemID == R.id.action_stop_scrapping) {
                             Utils.StopAllRunningScrappingService(getApplicationContext());
+                            return true;
+                        } else if(itemID == R.id.action_refresh_graph) {
+                            Refresh();
+                            RefreshChart();
                             return true;
                         }
                         return false;

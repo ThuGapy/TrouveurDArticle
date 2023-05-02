@@ -81,13 +81,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public Cursor getAllItems() {
+    public CursorWrapper getAllItems() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(ITEM_TABLE, null, null, null, null, null, "id DESC");
-        return cursor;
+        return new CursorWrapper(cursor, db);
     }
 
-    public Cursor getAllItemsStockStatus() {
+    public CursorWrapper getAllItemsStockStatus() {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String query = "SELECT p.id as _id, p.nomArticle, p.prix, " +
@@ -105,17 +105,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "       (SELECT prix FROM scrape_results WHERE link = p.memoryexpress) AS memoryexpress_price" +
                 " FROM produits AS p";
 
-        return db.rawQuery(query, null);
+        return new CursorWrapper(db.rawQuery(query, null), db);
     }
 
-    public Cursor getItem(int ID) {
+    public CursorWrapper getItem(int ID) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String query = "SELECT id, nomArticle, amazon, newegg, canadacomputers, memoryexpress, prix FROM produits WHERE id = " + ID;
         Cursor cursor = db.rawQuery(query, null);
         cursor.moveToFirst();
 
-        return cursor;
+        return new CursorWrapper(cursor, db);
     }
 
     public String getProductName(int ID) {
@@ -125,14 +125,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         cursor.moveToFirst();
 
+        String productName = "";
         try {
-            return cursor.getString(cursor.getColumnIndexOrThrow("nomArticle"));
-        } catch(IllegalArgumentException ex) {
-            return "";
-        }
+            productName =  cursor.getString(cursor.getColumnIndexOrThrow("nomArticle"));
+        } catch(IllegalArgumentException ex) {}
+
+        cursor.close();
+        return productName;
     }
 
-    public Cursor getLatestLinkData(String link) {
+    public CursorWrapper getLatestLinkData(String link) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String[] columns = {"id", "link", "instock", "prix", "temps"};
@@ -144,20 +146,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
         }
 
-        return cursor;
+        return new CursorWrapper(cursor, db);
     }
 
     public List<LinkStatus> getStoreFrontStatus(int ID) {
         List<LinkStatus> statusList = new ArrayList<LinkStatus>();
 
-        Cursor cursor = getItem(ID);
-        double prix = cursor.getDouble(cursor.getColumnIndexOrThrow("prix"));
-        String amazonLink = cursor.getString(cursor.getColumnIndexOrThrow("amazon"));
-        String neweggLink = cursor.getString(cursor.getColumnIndexOrThrow("newegg"));
-        String canadaComputersLink = cursor.getString(cursor.getColumnIndexOrThrow("canadacomputers"));
-        String memoryExpressLink = cursor.getString(cursor.getColumnIndexOrThrow("memoryexpress"));
+        CursorWrapper wrapper = getItem(ID);
+        double prix = wrapper.cursor.getDouble(wrapper.cursor.getColumnIndexOrThrow("prix"));
+        String amazonLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("amazon"));
+        String neweggLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("newegg"));
+        String canadaComputersLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("canadacomputers"));
+        String memoryExpressLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("memoryexpress"));
+        wrapper.Close();
 
-        Cursor linkData;
+        CursorWrapper linkData;
         double price;
         boolean stock;
 
@@ -165,17 +168,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (!amazonLink.equals("")) {
                 linkData = getLatestLinkData(amazonLink);
                 try {
-                    price = linkData.getDouble(linkData.getColumnIndexOrThrow("prix"));
-                    stock = linkData.getInt(linkData.getColumnIndexOrThrow("instock")) == 1;
+                    price = linkData.cursor.getDouble(linkData.cursor.getColumnIndexOrThrow("prix"));
+                    stock = linkData.cursor.getInt(linkData.cursor.getColumnIndexOrThrow("instock")) == 1;
 
-                    LinkStatus amazonResult = new LinkStatus(stock, price, linkData.getString(linkData.getColumnIndexOrThrow("temps")), amazonLink, StoreFront.Amazon);
+                    LinkStatus amazonResult = new LinkStatus(stock, price, linkData.cursor.getString(linkData.cursor.getColumnIndexOrThrow("temps")), amazonLink, StoreFront.Amazon);
                     amazonResult.DetermineStatus(prix);
                     statusList.add(amazonResult);
                 } catch (IllegalArgumentException | CursorIndexOutOfBoundsException ex) {
                     statusList.add(new LinkStatus(false, 0, "", "", StoreFront.Amazon));
                 }
 
-                linkData.close();
+                linkData.Close();
             }
         }
 
@@ -183,17 +186,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (!neweggLink.equals("")) {
                 linkData = getLatestLinkData(neweggLink);
                 try {
-                    price = linkData.getDouble(linkData.getColumnIndexOrThrow("prix"));
-                    stock = linkData.getInt(linkData.getColumnIndexOrThrow("instock")) == 1;
+                    price = linkData.cursor.getDouble(linkData.cursor.getColumnIndexOrThrow("prix"));
+                    stock = linkData.cursor.getInt(linkData.cursor.getColumnIndexOrThrow("instock")) == 1;
 
-                    LinkStatus neweggResult = new LinkStatus(stock, price, linkData.getString(linkData.getColumnIndexOrThrow("temps")), neweggLink, StoreFront.Newegg);
+                    LinkStatus neweggResult = new LinkStatus(stock, price, linkData.cursor.getString(linkData.cursor.getColumnIndexOrThrow("temps")), neweggLink, StoreFront.Newegg);
                     neweggResult.DetermineStatus(prix);
                     statusList.add(neweggResult);
                 } catch (IllegalArgumentException | CursorIndexOutOfBoundsException ex) {
                     statusList.add(new LinkStatus(false, 0, "", "", StoreFront.Newegg));
                 }
 
-                linkData.close();
+                linkData.Close();
             }
         }
 
@@ -201,17 +204,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (!canadaComputersLink.equals("")) {
                 linkData = getLatestLinkData(canadaComputersLink);
                 try {
-                    price = linkData.getDouble(linkData.getColumnIndexOrThrow("prix"));
-                    stock = linkData.getInt(linkData.getColumnIndexOrThrow("instock")) == 1;
+                    price = linkData.cursor.getDouble(linkData.cursor.getColumnIndexOrThrow("prix"));
+                    stock = linkData.cursor.getInt(linkData.cursor.getColumnIndexOrThrow("instock")) == 1;
 
-                    LinkStatus canadaComputersResult = new LinkStatus(stock, price, linkData.getString(linkData.getColumnIndexOrThrow("temps")), canadaComputersLink, StoreFront.CanadaComputers);
+                    LinkStatus canadaComputersResult = new LinkStatus(stock, price, linkData.cursor.getString(linkData.cursor.getColumnIndexOrThrow("temps")), canadaComputersLink, StoreFront.CanadaComputers);
                     canadaComputersResult.DetermineStatus(prix);
                     statusList.add(canadaComputersResult);
                 } catch (IllegalArgumentException | CursorIndexOutOfBoundsException ex) {
                     statusList.add(new LinkStatus(false, 0, "", "", StoreFront.CanadaComputers));
                 }
 
-                linkData.close();
+                linkData.Close();
             }
         }
 
@@ -219,17 +222,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (!memoryExpressLink.equals("")) {
                 linkData = getLatestLinkData(memoryExpressLink);
                 try {
-                    price = linkData.getDouble(linkData.getColumnIndexOrThrow("prix"));
-                    stock = linkData.getInt(linkData.getColumnIndexOrThrow("instock")) == 1;
+                    price = linkData.cursor.getDouble(linkData.cursor.getColumnIndexOrThrow("prix"));
+                    stock = linkData.cursor.getInt(linkData.cursor.getColumnIndexOrThrow("instock")) == 1;
 
-                    LinkStatus memoryExpressResult = new LinkStatus(stock, price, linkData.getString(linkData.getColumnIndexOrThrow("temps")), memoryExpressLink, StoreFront.MemoryExpress);
+                    LinkStatus memoryExpressResult = new LinkStatus(stock, price, linkData.cursor.getString(linkData.cursor.getColumnIndexOrThrow("temps")), memoryExpressLink, StoreFront.MemoryExpress);
                     memoryExpressResult.DetermineStatus(prix);
                     statusList.add(memoryExpressResult);
                 } catch (IllegalArgumentException | CursorIndexOutOfBoundsException ex) {
                     statusList.add(new LinkStatus(false, 0, "", "", StoreFront.MemoryExpress));
                 }
 
-                linkData.close();
+                linkData.Close();
             }
         }
 
@@ -242,18 +245,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT instock, prix FROM scrape_results WHERE link = '" + link + "'";
         Cursor cursor = db.rawQuery(query, null);
+
+        ScrapperResult result = null;
+
         if(cursor.moveToFirst()) {
             try {
                 boolean inStock = cursor.getInt(cursor.getColumnIndexOrThrow("instock")) == 1;
                 double prix = cursor.getDouble(cursor.getColumnIndexOrThrow("prix"));
 
-                return new ScrapperResult(inStock, prix);
-            } catch(IllegalArgumentException ex) {
-                return null;
-            }
-        } else {
-            return null;
+                result = new ScrapperResult(inStock, prix);
+            } catch(IllegalArgumentException ex) {}
         }
+
+        cursor.close();
+        db.close();
+        return result;
     }
 
     public double getTargetPrice(int ID) {
@@ -261,15 +267,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT prix FROM produits WHERE id = " + ID;
         Cursor cursor = db.rawQuery(query, null);
+
+        double price = 0;
+
         if(cursor.moveToFirst()) {
             try {
-                return cursor.getDouble(cursor.getColumnIndexOrThrow("prix"));
-            } catch (IllegalArgumentException ex) {
-                return 0;
-            }
-        } else {
-            return 0;
+                price = cursor.getDouble(cursor.getColumnIndexOrThrow("prix"));
+            } catch (IllegalArgumentException ex) {}
         }
+
+        cursor.close();
+        db.close();
+        return price;
     }
 
     public boolean hasScrapeData(String link) {
@@ -287,6 +296,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
         return result;
     }
 
@@ -307,13 +317,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ScrapperResult result = null;
         if(cursor.moveToFirst()) {
-            System.out.println("moved to first");
             result = new ScrapperResult(cursor.getInt(cursor.getColumnIndexOrThrow("instock")) == 1, cursor.getDouble(cursor.getColumnIndexOrThrow("prix")));
-        } else {
-            System.out.println("nothing found");
         }
 
         cursor.close();
+        db.close();
         return result;
     }
 
@@ -348,11 +356,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     public LineData getLineData(int ID) {
-        Cursor item = getItem(ID);
-        String amazonLink = item.getString(item.getColumnIndexOrThrow("amazon"));
-        String neweggLink = item.getString(item.getColumnIndexOrThrow("newegg"));
-        String canadaComputersLink = item.getString(item.getColumnIndexOrThrow("canadacomputers"));
-        String memoryExpressLink = item.getString(item.getColumnIndexOrThrow("memoryexpress"));
+        CursorWrapper wrapper = getItem(ID);
+        String amazonLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("amazon"));
+        String neweggLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("newegg"));
+        String canadaComputersLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("canadacomputers"));
+        String memoryExpressLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("memoryexpress"));
+        wrapper.Close();
 
         List<ILineDataSet> dataSets = new ArrayList<>();
 
@@ -453,7 +462,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Utils.SendNotification(title, description, context, preferences);
             }
         } else {
-            System.out.println("The previous result is the same, skipping this scrape result");
+            System.out.println("Le resultat precedent est similaire, on passe ce resultat");
         }
     }
 
@@ -480,6 +489,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } catch (IllegalArgumentException ex) {}
         }
 
+        readCursor.close();
         wdb.close();
         db.close();
     }
@@ -502,5 +512,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         long date = System.currentTimeMillis() - WeekInMillis;
         db.delete("scrape_results", "temps < ?", new String[] {String.valueOf(date)});
+        db.close();
     }
 }

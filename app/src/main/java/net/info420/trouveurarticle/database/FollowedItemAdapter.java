@@ -27,11 +27,15 @@ public class FollowedItemAdapter extends CursorAdapter {
     private ListView adapterListView;
     private OnProductInteractionListener activityInteractionListener;
     private OnRefreshRequestedListener fragmentRefreshListener;
+    private CursorWrapper wrapper;
 
-    public FollowedItemAdapter(Context context, OnProductInteractionListener editListener, OnRefreshRequestedListener refreshListener) {
+    public FollowedItemAdapter(Context context, CursorWrapper _wrapper, OnProductInteractionListener editListener, OnRefreshRequestedListener refreshListener) {
         super(context, null, 0);
+        wrapper = _wrapper;
         activityInteractionListener = editListener;
         fragmentRefreshListener = refreshListener;
+
+        changeCursor(wrapper.cursor);
     }
 
     @Override
@@ -194,6 +198,15 @@ public class FollowedItemAdapter extends CursorAdapter {
             productPrice.setText(Utils.FormatPrice(price));
         } else {
             productPrice.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            wrapper.Close();
+        } finally {
+            super.finalize();
         }
     }
 }

@@ -34,9 +34,11 @@ public class CanadaComputersScrapper extends Scrapper{
     @Override
     public String FetchProductName(Document document) {
         Element productNameElement = document.selectFirst("h1.h3.mb-0");
-        if(productNameElement != null) {
-            return productNameElement.text().trim();
-        }
+        try {
+            if(productNameElement != null) {
+                return productNameElement.text().trim();
+            }
+        } catch(NullPointerException ex) {}
         return null;
     }
 }

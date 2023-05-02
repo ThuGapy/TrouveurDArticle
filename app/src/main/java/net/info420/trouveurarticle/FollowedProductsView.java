@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import net.info420.trouveurarticle.database.AppSettings;
+import net.info420.trouveurarticle.database.CursorWrapper;
 import net.info420.trouveurarticle.database.DatabaseHelper;
 import net.info420.trouveurarticle.database.FollowedItemAdapter;
 import net.info420.trouveurarticle.views.OnRefreshRequestedListener;
@@ -21,7 +22,7 @@ import net.info420.trouveurarticle.views.OnProductInteractionListener;
 public class FollowedProductsView extends Fragment implements OnRefreshRequestedListener {
     private View fragmentView;
     private DatabaseHelper dbHelper;
-    private Cursor dataCursor;
+    private CursorWrapper dataCursor;
     private FollowedItemAdapter itemAdapter;
     private AppSettings preferences;
     private Handler refreshHandler;
@@ -67,8 +68,7 @@ public class FollowedProductsView extends Fragment implements OnRefreshRequested
 
     public void Refresh() {
         dataCursor = dbHelper.getAllItemsStockStatus();
-        itemAdapter = new FollowedItemAdapter(getActivity(), (OnProductInteractionListener) getActivity(), (OnRefreshRequestedListener) this);
-        itemAdapter.changeCursor(dataCursor);
+        itemAdapter = new FollowedItemAdapter(getActivity(), dataCursor, (OnProductInteractionListener) getActivity(), (OnRefreshRequestedListener) this);
         ListView itemView = fragmentView.findViewById(R.id.item_listview);
         itemView.setAdapter(itemAdapter);
     }

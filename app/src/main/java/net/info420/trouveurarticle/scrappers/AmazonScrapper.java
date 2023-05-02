@@ -51,9 +51,11 @@ public class AmazonScrapper extends Scrapper{
     @Override
     public String FetchProductName(Document document) {
         Element productNameElement = document.selectFirst("#productTitle");
-        if(productNameElement != null) {
-            return productNameElement.text().trim();
-        }
+        try {
+            if (productNameElement != null) {
+                return productNameElement.text().trim();
+            }
+        } catch(NullPointerException ex) {}
         return null;
     }
 }

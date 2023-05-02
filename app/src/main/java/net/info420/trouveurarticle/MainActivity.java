@@ -96,10 +96,8 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
 
                 if(item.getItemId() == R.id.homeFragment) {
                     fragment = new FollowedProductsView();
-                    System.out.println("mainview fragment");
                 } else if(item.getItemId() == R.id.addProductFragment) {
                     fragment = new AddProductView();
-                    System.out.println("addproduct fragment");
                 }
 
                 getSupportFragmentManager().beginTransaction()

@@ -100,7 +100,6 @@ public class AddProductButtonGroup extends LinearLayout {
                         break;
                 }
 
-                //System.out.println(link);
                 if(!link.equals("")) {
                     View popupView = LayoutInflater.from(context).inflate(R.layout.easy_search_popup, null);
                     PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);

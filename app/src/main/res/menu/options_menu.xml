@@ -8,12 +8,18 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_start_scrapping"
-        android:title="Start scrapping service"
+        android:title="Lancer le service de suivi"
         android:orderInCategory="200"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_stop_scrapping"
-        android:title="Stop scrapping service"
+        android:title="Arrêter le service de suivi"
         android:orderInCategory="300"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_refresh_graph"
+        android:title="Rafraichir les données"
+        android:orderInCategory="300"
+        android:visible="false"
         app:showAsAction="never" />
 </menu>

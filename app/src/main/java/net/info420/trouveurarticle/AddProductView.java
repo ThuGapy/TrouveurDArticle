@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.info420.trouveurarticle.database.AppSettings;
+import net.info420.trouveurarticle.database.CursorWrapper;
 import net.info420.trouveurarticle.database.DatabaseHelper;
 import net.info420.trouveurarticle.scrappers.AmazonScrapper;
 import net.info420.trouveurarticle.scrappers.CanadaComputersScrapper;
@@ -30,10 +32,12 @@ import net.info420.trouveurarticle.views.OnProductInteractionListener;
 public class AddProductView extends Fragment {
     private View fragmentView;
     private DatabaseHelper dbHelper;
+    private EditText productName;
     private AddProductButtonGroup amazonButtonGroup;
     private AddProductButtonGroup neweggButtonGroup;
     private AddProductButtonGroup canadaComputersButtonGroup;
     private AddProductButtonGroup memoryExpressButtonGroup;
+    private EditText productPrice;
     private AppSettings preferences;
     private int editId;
     private boolean editMode;
@@ -76,7 +80,7 @@ public class AddProductView extends Fragment {
 
         TextView addProductTextView = fragmentView.findViewById(R.id.add_product_text_view);
 
-        EditText productName = fragmentView.findViewById(R.id.product_name_edit);
+        productName = fragmentView.findViewById(R.id.product_name_edit);
 
         amazonButtonGroup = fragmentView.findViewById(R.id.amazon_button_group);
         amazonButtonGroup.SetType(StoreFront.Amazon);
@@ -90,22 +94,22 @@ public class AddProductView extends Fragment {
         memoryExpressButtonGroup = fragmentView.findViewById(R.id.memory_express_button_group);
         memoryExpressButtonGroup.SetType(StoreFront.MemoryExpress);
 
-        EditText productPrice = fragmentView.findViewById(R.id.price_textbox);
+        productPrice = fragmentView.findViewById(R.id.price_textbox);
 
         if(editMode) {
-            Cursor cursor = dbHelper.getItem(editId);
+            CursorWrapper wrapper = dbHelper.getItem(editId);
 
             addProductTextView.setText("Modification d'un produit");
             addButton.setVisibility(View.GONE);
             clearButton.setVisibility(View.GONE);
             modifyButton.setVisibility(View.VISIBLE);
 
-            productName.setText(cursor.getString(cursor.getColumnIndexOrThrow("nomArticle")));
-            amazonButtonGroup.getEditText().setText(cursor.getString(cursor.getColumnIndexOrThrow("amazon")));
-            neweggButtonGroup.getEditText().setText(cursor.getString(cursor.getColumnIndexOrThrow("newegg")));
-            canadaComputersButtonGroup.getEditText().setText(cursor.getString(cursor.getColumnIndexOrThrow("canadacomputers")));
-            memoryExpressButtonGroup.getEditText().setText(cursor.getString(cursor.getColumnIndexOrThrow("memoryexpress")));
-            productPrice.setText(String.valueOf(cursor.getDouble(cursor.getColumnIndexOrThrow("prix"))));
+            productName.setText(wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("nomArticle")));
+            amazonButtonGroup.getEditText().setText(wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("amazon")));
+            neweggButtonGroup.getEditText().setText(wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("newegg")));
+            canadaComputersButtonGroup.getEditText().setText(wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("canadacomputers")));
+            memoryExpressButtonGroup.getEditText().setText(wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("memoryexpress")));
+            productPrice.setText(String.valueOf(wrapper.cursor.getDouble(wrapper.cursor.getColumnIndexOrThrow("prix"))));
 
             modifyButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -119,36 +123,21 @@ public class AddProductView extends Fragment {
                             String canadacomputersLink = String.valueOf(canadaComputersButtonGroup.getEditText().getText());
                             String memoryExpressLink = String.valueOf(memoryExpressButtonGroup.getEditText().getText());
 
-                            System.out.println("amazonlink: " + amazonLink);
+                            String fetchedString = GetProductName();
+
                             double wantedPrice = 0;
                             try {
                                 wantedPrice = Double.parseDouble(String.valueOf(productPrice.getText()));
                             } catch(NumberFormatException ex) {}
 
-                            String fetchedString = null;
-                            String productName = productNameString;
-
-                            if(preferences.getAutomaticallyReplaceProductName()) {
-                                Scrapper productNameScrapper;
-                                if(!amazonLink.equals("")) {
-                                    productNameScrapper = new AmazonScrapper();
-                                    fetchedString = productNameScrapper.FetchProductName(amazonLink);
-                                } else if(!neweggLink.equals("")) {
-                                    productNameScrapper = new NeweggScrapper();
-                                    fetchedString = productNameScrapper.FetchProductName(neweggLink);
-                                } else if(!canadacomputersLink.equals("")) {
-                                    productNameScrapper = new CanadaComputersScrapper();
-                                    fetchedString = productNameScrapper.FetchProductName(canadacomputersLink);
-                                } else if(!memoryExpressLink.equals("")) {
-                                    productNameScrapper = new MemoryExpressScrapper();
-                                    fetchedString = productNameScrapper.FetchProductName(memoryExpressLink);
-                                }
-                            }
-
                             if(!productNameString.equals("") && wantedPrice != 0 && (!amazonLink.equals("") || !neweggLink.equals("") || !canadacomputersLink.equals("") || !memoryExpressLink.equals(""))) {
                                 String stringToAdd = productNameString;
-                                if(preferences.getAutomaticallyReplaceProductName() && (!fetchedString.equals("") && fetchedString != null)) {
-                                    stringToAdd = fetchedString;
+                                if(preferences.getAutomaticallyReplaceProductName()) {
+                                    if(!TextUtils.isEmpty(fetchedString)) {
+                                        stringToAdd = fetchedString;
+                                    } else {
+                                        ShowToast("Impossible d'obtenir le nom automatiquemen");
+                                    }
                                 }
 
                                 dbHelper.updateItem(editId, stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
@@ -163,6 +152,8 @@ public class AddProductView extends Fragment {
                     }).start();
                 }
             });
+
+            wrapper.Close();
         }
 
         clearButton.setOnClickListener(new View.OnClickListener() {
@@ -184,35 +175,22 @@ public class AddProductView extends Fragment {
                         String neweggLink = String.valueOf(neweggButtonGroup.getEditText().getText());
                         String canadacomputersLink = String.valueOf(canadaComputersButtonGroup.getEditText().getText());
                         String memoryExpressLink = String.valueOf(memoryExpressButtonGroup.getEditText().getText());
+
+                        String fetchedString = GetProductName();
+
                         double wantedPrice = 0;
                         try {
                             wantedPrice = Double.parseDouble(String.valueOf(productPrice.getText()));
                         } catch(NumberFormatException ex) {}
 
-                        String fetchedString = null;
-                        String productName = productNameString;
-
-                        if(preferences.getAutomaticallyReplaceProductName()) {
-                            Scrapper productNameScrapper;
-                            if(!amazonLink.equals("")) {
-                                productNameScrapper = new AmazonScrapper();
-                                fetchedString = productNameScrapper.FetchProductName(amazonLink);
-                            } else if(!neweggLink.equals("")) {
-                                productNameScrapper = new NeweggScrapper();
-                                fetchedString = productNameScrapper.FetchProductName(neweggLink);
-                            } else if(!canadacomputersLink.equals("")) {
-                                productNameScrapper = new CanadaComputersScrapper();
-                                fetchedString = productNameScrapper.FetchProductName(canadacomputersLink);
-                            } else if(!memoryExpressLink.equals("")) {
-                                productNameScrapper = new MemoryExpressScrapper();
-                                fetchedString = productNameScrapper.FetchProductName(memoryExpressLink);
-                            }
-                        }
-
                         if(!productNameString.equals("") && wantedPrice != 0 && (!amazonLink.equals("") || !neweggLink.equals("") || !canadacomputersLink.equals("") || !memoryExpressLink.equals(""))) {
                             String stringToAdd = productNameString;
-                            if(preferences.getAutomaticallyReplaceProductName() && (!fetchedString.equals("") && fetchedString != null)) {
-                                stringToAdd = fetchedString;
+                            if(preferences.getAutomaticallyReplaceProductName()) {
+                                if(!TextUtils.isEmpty(fetchedString)) {
+                                    stringToAdd = fetchedString;
+                                } else {
+                                    ShowToast("Impossible d'obtenir le nom automatiquemen");
+                                }
                             }
 
                             dbHelper.createNewItem(stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
@@ -230,6 +208,36 @@ public class AddProductView extends Fragment {
         });
 
         return fragmentView;
+    }
+
+    private String GetProductName() {
+        String productNameString = String.valueOf(productName.getText());
+        String amazonLink = String.valueOf(amazonButtonGroup.getEditText().getText());
+        String neweggLink = String.valueOf(neweggButtonGroup.getEditText().getText());
+        String canadacomputersLink = String.valueOf(canadaComputersButtonGroup.getEditText().getText());
+        String memoryExpressLink = String.valueOf(memoryExpressButtonGroup.getEditText().getText());
+
+        String fetchedString = null;
+        String productName = productNameString;
+
+        if(preferences.getAutomaticallyReplaceProductName()) {
+            Scrapper productNameScrapper;
+            if(!amazonLink.equals("")) {
+                productNameScrapper = new AmazonScrapper();
+                fetchedString = productNameScrapper.FetchProductName(amazonLink);
+            } else if(!neweggLink.equals("")) {
+                productNameScrapper = new NeweggScrapper();
+                fetchedString = productNameScrapper.FetchProductName(neweggLink);
+            } else if(!canadacomputersLink.equals("")) {
+                productNameScrapper = new CanadaComputersScrapper();
+                fetchedString = productNameScrapper.FetchProductName(canadacomputersLink);
+            } else if(!memoryExpressLink.equals("")) {
+                productNameScrapper = new MemoryExpressScrapper();
+                fetchedString = productNameScrapper.FetchProductName(memoryExpressLink);
+            }
+        }
+
+        return fetchedString;
     }
 
     public void ClearInputs() {

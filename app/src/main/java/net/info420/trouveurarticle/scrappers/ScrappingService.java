@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.IBinder;
 
 import net.info420.trouveurarticle.database.AppSettings;
+import net.info420.trouveurarticle.database.CursorWrapper;
 import net.info420.trouveurarticle.database.DatabaseHelper;
 import net.info420.trouveurarticle.database.DeviceUtils;
 
@@ -50,23 +51,21 @@ public class ScrappingService extends Service {
         serviceRunnable = new Runnable() {
             @Override
             public void run() {
-                System.out.println("running scrapping service");
+                System.out.println("Running scrapping service");
                 int previousInterval = currentInterval;
                 GetShouldBeInterval();
 
-                System.out.println("Current interval: " + currentInterval + " Should Fetch Data: " + shouldFetchData);
-
-                Cursor produitCursor = dbHelper.getAllItems();
+                CursorWrapper produitCursor = dbHelper.getAllItems();
                 if(produitCursor != null) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            while(produitCursor.moveToNext()) {
-                                String nomProduit = produitCursor.getString(produitCursor.getColumnIndexOrThrow("nomArticle"));
-                                String amazonLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("amazon"));
-                                String neweggLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("newegg"));
-                                String canadaComputersLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("canadacomputers"));
-                                String memoryExpressLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("memoryexpress"));
+                            while(produitCursor.cursor.moveToNext()) {
+                                String nomProduit = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("nomArticle"));
+                                String amazonLink = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("amazon"));
+                                String neweggLink = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("newegg"));
+                                String canadaComputersLink = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("canadacomputers"));
+                                String memoryExpressLink = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("memoryexpress"));
 
                                 if(amazonLink != null && !amazonLink.equals("")) {
                                     new Thread(new Runnable() {
@@ -131,7 +130,7 @@ public class ScrappingService extends Service {
                                 }
                             }
 
-                            produitCursor.close();
+                            produitCursor.Close();
                         }
                     }).start();
                 }
@@ -156,7 +155,7 @@ public class ScrappingService extends Service {
         serviceRunnable = new Runnable() {
             @Override
             public void run() {
-                System.out.println("pending service running");
+                System.out.println("Pending service running");
                 GetShouldBeInterval();
 
                 if(shouldFetchData) {
