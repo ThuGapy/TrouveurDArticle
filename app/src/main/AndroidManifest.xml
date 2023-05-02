@@ -44,6 +44,13 @@
         </activity>
 
         <service android:name=".scrappers.ScrappingService" />
+
+        <receiver android:name=".database.LowBatteryReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BATTERY_LOW" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

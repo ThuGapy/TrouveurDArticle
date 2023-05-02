@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -18,6 +19,7 @@ import net.info420.trouveurarticle.database.AppSettings;
 import net.info420.trouveurarticle.database.CursorWrapper;
 import net.info420.trouveurarticle.database.DatabaseHelper;
 import net.info420.trouveurarticle.database.DeviceUtils;
+import net.info420.trouveurarticle.database.LowBatteryReceiver;
 
 public class ScrappingService extends Service {
     private DatabaseHelper dbHelper;
@@ -27,6 +29,7 @@ public class ScrappingService extends Service {
     private Runnable serviceRunnable;
     private boolean shouldFetchData = false;
     private int currentInterval;
+    private LowBatteryReceiver receiver;
 
     @Override
     public void onCreate() {
@@ -37,6 +40,10 @@ public class ScrappingService extends Service {
 
         CreateNotificationChannel();
         startForeground(1, CreateNotification());
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_LOW);
+        receiver = new LowBatteryReceiver();
+        registerReceiver(receiver, filter);
     }
 
     @Override
@@ -55,6 +62,13 @@ public class ScrappingService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        unregisterReceiver(receiver);
     }
 
     private void ScheduleService(int interval) {
