@@ -1,12 +1,19 @@
 package net.info420.trouveurarticle.scrappers;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 
+import androidx.core.app.NotificationCompat;
+
+import net.info420.trouveurarticle.R;
 import net.info420.trouveurarticle.database.AppSettings;
 import net.info420.trouveurarticle.database.CursorWrapper;
 import net.info420.trouveurarticle.database.DatabaseHelper;
@@ -27,6 +34,9 @@ public class ScrappingService extends Service {
         dbHelper = new DatabaseHelper(getApplicationContext());
         preferences = new AppSettings(getApplicationContext());
         serviceHandler = new Handler();
+
+        CreateNotificationChannel();
+        startForeground(1, CreateNotification());
     }
 
     @Override
@@ -202,5 +212,33 @@ public class ScrappingService extends Service {
 
         currentInterval = interval;
         shouldFetchData = interval != 0;
+    }
+
+    private void CreateNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Service de suivi";
+            String description = "Service d'avant-plan pour le suivi des articles";
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel("scrapping_foreground_channel", name, importance);
+            channel.setDescription(description);
+            channel.enableVibration(false);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+    }
+
+    private Notification CreateNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "scrapping_foreground_channel")
+                .setContentTitle("Service de suivi")
+                .setContentText("Suivi de vos produits...")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW);
+
+        return builder.build();
     }
 }
