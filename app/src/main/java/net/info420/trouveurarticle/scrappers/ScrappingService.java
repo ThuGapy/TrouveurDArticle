@@ -62,6 +62,7 @@ public class ScrappingService extends Service {
                         @Override
                         public void run() {
                             while(produitCursor.moveToNext()) {
+                                String nomProduit = produitCursor.getString(produitCursor.getColumnIndexOrThrow("nomArticle"));
                                 String amazonLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("amazon"));
                                 String neweggLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("newegg"));
                                 String canadaComputersLink = produitCursor.getString(produitCursor.getColumnIndexOrThrow("canadacomputers"));
@@ -75,7 +76,7 @@ public class ScrappingService extends Service {
                                             AmazonScrapper amazonScrapper = new AmazonScrapper();;
                                             ScrapperResult amazonResult = amazonScrapper.Fetch(amazonLink);
                                             if(amazonResult != null) {
-                                                dbHelper.createScrapeResult(amazonLink, amazonResult);
+                                                dbHelper.createScrapeResult(amazonLink, amazonResult, nomProduit, StoreFront.Amazon, getApplicationContext(), preferences);
                                             }
                                         }
                                     }).start();
@@ -89,7 +90,7 @@ public class ScrappingService extends Service {
                                             NeweggScrapper neweggScrapper = new NeweggScrapper();;
                                             ScrapperResult neweggResult = neweggScrapper.Fetch(neweggLink);
                                             if(neweggResult != null) {
-                                                dbHelper.createScrapeResult(neweggLink, neweggResult);
+                                                dbHelper.createScrapeResult(neweggLink, neweggResult, nomProduit, StoreFront.Newegg, getApplicationContext(), preferences);
                                             }
                                         }
                                     }).start();
@@ -103,7 +104,7 @@ public class ScrappingService extends Service {
                                             CanadaComputersScrapper canadaComputersScrapper = new CanadaComputersScrapper();;
                                             ScrapperResult canadaComputersResult = canadaComputersScrapper.Fetch(canadaComputersLink);
                                             if(canadaComputersResult != null) {
-                                                dbHelper.createScrapeResult(canadaComputersLink, canadaComputersResult);
+                                                dbHelper.createScrapeResult(canadaComputersLink, canadaComputersResult, nomProduit, StoreFront.CanadaComputers, getApplicationContext(), preferences);
                                             }
                                         }
                                     }).start();
@@ -117,7 +118,7 @@ public class ScrappingService extends Service {
                                             MemoryExpressScrapper memoryExpressScrapper = new MemoryExpressScrapper();;
                                             ScrapperResult memoryExpressResult = memoryExpressScrapper.Fetch(memoryExpressLink);
                                             if(memoryExpressResult != null) {
-                                                dbHelper.createScrapeResult(memoryExpressLink, memoryExpressResult);
+                                                dbHelper.createScrapeResult(memoryExpressLink, memoryExpressResult, nomProduit, StoreFront.MemoryExpress, getApplicationContext(), preferences);
                                             }
                                         }
                                     }).start();

@@ -1,5 +1,8 @@
 package net.info420.trouveurarticle;
 
+import static net.info420.trouveurarticle.database.AppSettings.INTERNET_PERMISSION;
+import static net.info420.trouveurarticle.database.AppSettings.SETTINGS_PERMISSION;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -8,10 +11,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -19,6 +18,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,12 +28,7 @@ import net.info420.trouveurarticle.database.AppSettings;
 import net.info420.trouveurarticle.scrappers.ScrappingService;
 import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity implements OnProductInteractionListener {
-
-    private static final int INTERNET_PERMISSION = 1;
-    private static final int SETTINGS_PERMISSION = 2;
     private AppSettings preferences;
 
     @Override
@@ -55,7 +50,37 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Settings(view);
+                PopupMenu popupMenu = new PopupMenu(MainActivity.this, view);
+                getMenuInflater().inflate(R.menu.options_menu, popupMenu.getMenu());
+
+                MenuItem startScrappingItem = popupMenu.getMenu().findItem(R.id.action_start_scrapping);
+                MenuItem stopScrappingItem = popupMenu.getMenu().findItem(R.id.action_stop_scrapping);
+
+                if(Utils.IsScrappingServiceRunning(getApplicationContext())) {
+                    startScrappingItem.setEnabled(false);
+                } else {
+                    stopScrappingItem.setEnabled(false);
+                }
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int itemID = item.getItemId();
+                        if(itemID == R.id.action_options) {
+                            Settings(view);
+                            return true;
+                        } else if(itemID == R.id.action_start_scrapping) {
+                            Intent startScrappingService = new Intent(getApplicationContext(), ScrappingService.class);
+                            startService(startScrappingService);
+                            return true;
+                        } else if(itemID == R.id.action_stop_scrapping) {
+                            Utils.StopAllRunningScrappingService(getApplicationContext());
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.show();
             }
         });
 
@@ -87,13 +112,6 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
         });
 
         ValiderPermissions();
-
-        StopAllRunningScrappingService();
-        if(!IsScrappingServiceRunning()) {
-            Intent scrappingService2 = new Intent(this, ScrappingService.class);
-            startService(scrappingService2);
-            System.out.println("Started scrapping service");
-        }
     }
 
     private void ValiderPermissions() {
@@ -103,66 +121,8 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
     }
 
     private void Settings(View view) {
-        if (ContextCompat.checkSelfPermission(this, "net.info420.trouveurarticle.permissions.OPTION_PERMISSION") != PackageManager.PERMISSION_GRANTED) {
-            System.out.println(preferences.getPermissionDeniedAmount());
-            if (preferences.getPermissionDeniedAmount() > 0) {
-                System.out.println("2");
-                showPermissionReason();
-            } else {
-                System.out.println("3");
-                ActivityCompat.requestPermissions(this, new String[]{"net.info420.trouveurarticle.permissions.OPTION_PERMISSION"}, SETTINGS_PERMISSION);
-            }
-        } else {
-            Intent intent = new Intent(this, Settings.class);
-            startActivity(intent);
-        }
-    }
-
-    private void showPermissionReason() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Cette application a besoin d'une permission pour ouvrir la page d'options. Allez dans les paramètres de l'application pour l'activer.")
-                .setPositiveButton("Ouvrir les paramètres", (dialog, which) -> openAppSettings())
-                .setNegativeButton("Annuler", (dialog, which) -> dialog.dismiss())
-                .create()
-                .show();
-    }
-
-    private void openAppSettings() {
-        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", getPackageName(), null);
-        intent.setData(uri);
-        startActivityForResult(intent, SETTINGS_PERMISSION);
-    }
-
-    private boolean IsScrappingServiceRunning() {
-        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        if(activityManager != null) {
-            for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-                if(ScrappingService.class.getName().equals(service.service.getClassName())) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private void StopAllRunningScrappingService() {
-        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        ComponentName componentName = new ComponentName(this, ScrappingService.class);
-
-        if (activityManager != null) {
-            List<ActivityManager.RunningServiceInfo> runningServices = activityManager.getRunningServices(Integer.MAX_VALUE);
-
-            for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-                if (service.service.equals(componentName)) {
-                    Intent stopServiceIntent = new Intent(this, ScrappingService.class);
-                    stopService(stopServiceIntent);
-
-                    System.out.println("Stopped Scrapping Service");
-                }
-            }
-        }
+        Intent intent = new Intent(this, Settings.class);
+        Utils.OpenSettings(getApplicationContext(), preferences, intent);
     }
 
     @Override

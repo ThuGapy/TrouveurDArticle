@@ -123,6 +123,17 @@
             android:text="Automatiquement rafraichir la page d'accueil chaque 10 secondes" />
 
         <Button
+            android:id="@+id/give_notifications_permission"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="4dp"
+            android:text="Donner les permissions de notifications"
+            android:onClick="GiveNotificationsPermission" />
+
+        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

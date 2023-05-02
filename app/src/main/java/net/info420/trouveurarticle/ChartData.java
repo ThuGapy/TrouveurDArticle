@@ -8,11 +8,13 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -26,10 +28,12 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
+import net.info420.trouveurarticle.database.AppSettings;
 import net.info420.trouveurarticle.database.DatabaseHelper;
 import net.info420.trouveurarticle.database.FollowedItemAdapter;
 import net.info420.trouveurarticle.database.LinkStatus;
 import net.info420.trouveurarticle.database.PriceHistoryAdapter;
+import net.info420.trouveurarticle.scrappers.ScrappingService;
 import net.info420.trouveurarticle.views.OnProductInteractionListener;
 import net.info420.trouveurarticle.views.OnRefreshRequestedListener;
 import net.info420.trouveurarticle.views.graphs.DayOfWeekFormatter;
@@ -44,6 +48,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
     private DatabaseHelper dbHelper;
     private PriceHistoryAdapter adapter;
     private int ID;
+    private AppSettings preferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +56,8 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
 
         Intent intent = getIntent();
         ID = intent.getIntExtra("productID", 0);
+
+        preferences = new AppSettings(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         ImageButton goBackButton = findViewById(R.id.go_back_button);
@@ -64,13 +71,41 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         });
 
         ImageButton settingsButton = findViewById(R.id.settings_button);
+
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), Settings.class);
-                intent.putExtra("fromProduct", true);
-                intent.putExtra("productID", ID);
-                startActivity(intent);
+                PopupMenu popupMenu = new PopupMenu(ChartData.this, view);
+                getMenuInflater().inflate(R.menu.options_menu, popupMenu.getMenu());
+
+                MenuItem startScrappingItem = popupMenu.getMenu().findItem(R.id.action_start_scrapping);
+                MenuItem stopScrappingItem = popupMenu.getMenu().findItem(R.id.action_stop_scrapping);
+
+                if(Utils.IsScrappingServiceRunning(getApplicationContext())) {
+                    startScrappingItem.setEnabled(false);
+                } else {
+                    stopScrappingItem.setEnabled(false);
+                }
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int itemID = item.getItemId();
+                        if(itemID == R.id.action_options) {
+                            Settings(view);
+                            return true;
+                        } else if(itemID == R.id.action_start_scrapping) {
+                            Intent startScrappingService = new Intent(getApplicationContext(), ScrappingService.class);
+                            startService(startScrappingService);
+                            return true;
+                        } else if(itemID == R.id.action_stop_scrapping) {
+                            Utils.StopAllRunningScrappingService(getApplicationContext());
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.show();
             }
         });
 
@@ -147,6 +182,13 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         xAxis.setValueFormatter(new DayOfWeekFormatter());
 
         lineChart.invalidate();
+    }
+
+    public void Settings(View view) {
+        Intent intent = new Intent(getApplicationContext(), Settings.class);
+        intent.putExtra("fromProduct", true);
+        intent.putExtra("productID", ID);
+        Utils.OpenSettings(getApplicationContext(), preferences, intent);
     }
 
     @Override

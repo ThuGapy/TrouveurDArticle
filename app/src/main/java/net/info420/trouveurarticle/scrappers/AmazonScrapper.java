@@ -38,7 +38,7 @@ public class AmazonScrapper extends Scrapper{
         try {
             Element priceSpan = document.selectFirst("span.a-offscreen");
             String priceText = priceSpan.text();
-            priceText = priceText.replace("$", "");
+            priceText = priceText.replace("$", "").replace(",", "");
             price = Double.parseDouble(priceText);
         } catch(NullPointerException e) {
             System.out.println("Impossible d'obtenir le prix");

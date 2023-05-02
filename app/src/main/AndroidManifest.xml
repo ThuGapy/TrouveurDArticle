@@ -9,8 +9,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="net.info420.trouveurarticle.permissions.OPTION_PERMISSION" />
 
     <application
@@ -25,7 +24,8 @@
         tools:targetApi="31">
         <activity
             android:name=".ChartData"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/NoActionBarTheme"/>
         <activity
             android:name=".Settings"
             android:exported="false"

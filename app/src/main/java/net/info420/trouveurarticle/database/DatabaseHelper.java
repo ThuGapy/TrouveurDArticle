@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
     private static final String DB_NAME = "trouveur_article";
     private static final String ITEM_TABLE = "produits";
     private static final String LINK_TABLE = "scrape_results";
@@ -60,7 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + "link TEXT NOT NULL,"
             + "instock INTEGER NOT NULL,"
             + "prix REAL NOT NULL,"
-            + "temps TEXT DEFAULT CURRENT_TIMESTAMP"
+            + "temps TEXT DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime'))"
             + ")";
 
     public DatabaseHelper(Context context) {
@@ -406,7 +406,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void createScrapeResult(String link, ScrapperResult result) {
+    public void createScrapeResult(String link, ScrapperResult result, String productName, StoreFront storeFront, Context context, AppSettings preferences) {
         ScrapperResult previousResult = this.getPreviousResult(link);
         boolean shouldCreateScrapeResult = false;
 
@@ -430,6 +430,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             db.insert("scrape_results", null, values);
             db.close();
+
+            if(result.EnStock) {
+                String title = "";
+                String description = "Le produit " + productName + " est maintenant disponible au prix de " + Utils.FormatPrice(result.Prix);
+
+                switch (storeFront) {
+                    case Amazon:
+                        title = "Suivi de produit Amazon";
+                        break;
+                    case Newegg:
+                        title = "Suivi de produit Newegg";
+                        break;
+                    case CanadaComputers:
+                        title = "Suivi de produit CanadaComputers";
+                        break;
+                    case MemoryExpress:
+                        title = "Suivi de projet MemoryExpress";
+                        break;
+                }
+
+                Utils.SendNotification(title, description, context, preferences);
+            }
         } else {
             System.out.println("The previous result is the same, skipping this scrape result");
         }

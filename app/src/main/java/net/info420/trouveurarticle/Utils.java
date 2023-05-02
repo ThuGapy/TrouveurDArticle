@@ -1,8 +1,33 @@
 package net.info420.trouveurarticle;
 
+import static net.info420.trouveurarticle.database.AppSettings.SETTINGS_PERMISSION;
+
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+
+import androidx.activity.ComponentActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
+
+import net.info420.trouveurarticle.database.AppSettings;
+import net.info420.trouveurarticle.scrappers.ScrappingService;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class Utils {
@@ -47,5 +72,96 @@ public class Utils {
         } catch(NullPointerException ex) {
             return "";
         }
+    }
+
+    public static void StopAllRunningScrappingService(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        ComponentName componentName = new ComponentName(context, ScrappingService.class);
+
+        if (activityManager != null) {
+            List<ActivityManager.RunningServiceInfo> runningServices = activityManager.getRunningServices(Integer.MAX_VALUE);
+
+            for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+                if (service.service.equals(componentName)) {
+                    Intent stopServiceIntent = new Intent(context, ScrappingService.class);
+                    context.stopService(stopServiceIntent);
+
+                    System.out.println("Stopped Scrapping Service");
+                }
+            }
+        }
+    }
+
+    public static boolean IsScrappingServiceRunning(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if(activityManager != null) {
+            for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+                if(ScrappingService.class.getName().equals(service.service.getClassName())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static void OpenSettings(Context context, AppSettings preferences, Intent intent) {
+        if (ContextCompat.checkSelfPermission(context, "net.info420.trouveurarticle.permissions.OPTION_PERMISSION") != PackageManager.PERMISSION_GRANTED) {
+            System.out.println(preferences.getPermissionDeniedAmount());
+            if (preferences.getPermissionDeniedAmount() > 0) {
+                Utils.ShowPermissionReason(context);
+            } else {
+                ActivityCompat.requestPermissions((Activity) context, new String[]{"net.info420.trouveurarticle.permissions.OPTION_PERMISSION"}, SETTINGS_PERMISSION);
+            }
+        } else {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+    }
+
+    public static void ShowPermissionReason(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage("Cette application a besoin d'une permission pour ouvrir la page d'options. Allez dans les paramètres de l'application pour l'activer.")
+                .setPositiveButton("Ouvrir les paramètres", (dialog, which) -> OpenAppSettings(context))
+                .setNegativeButton("Annuler", (dialog, which) -> dialog.dismiss())
+                .create()
+                .show();
+    }
+
+    public static void OpenAppSettings(Context context) {
+        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", context.getPackageName(), null);
+        intent.setData(uri);
+        ComponentActivity componentActivity = (ComponentActivity) context;
+        componentActivity.startActivityForResult(intent, SETTINGS_PERMISSION);
+    }
+
+    public static boolean AreNotificationsEnabled(Context context) {
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+        return notificationManagerCompat.areNotificationsEnabled();
+    }
+
+    public static void SendNotification(String title, String content, Context context, AppSettings preferences) {
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        String channelId = "scrape_result_channel";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence channelName = "Canal du trouveur d'article";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, importance);
+            channel.enableVibration(true);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            channel.setShowBadge(true);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+
+        notificationManager.notify(preferences.createNewNotification(), builder.build());
     }
 }

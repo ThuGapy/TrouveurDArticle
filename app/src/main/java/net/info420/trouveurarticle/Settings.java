@@ -6,9 +6,11 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -48,7 +50,34 @@ public class Settings extends AppCompatActivity {
             }
         });
 
+        UpdateNotificationButtonVisibility();
         UpdateEntryData();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        UpdateNotificationButtonVisibility();
+    }
+
+    private void UpdateNotificationButtonVisibility() {
+        if(Utils.AreNotificationsEnabled(this)) {
+            Button notificationPermission = findViewById(R.id.give_notifications_permission);
+            notificationPermission.setVisibility(View.GONE);
+        }
+    }
+
+    public void GiveNotificationsPermission(View view) {
+        Intent intent = new Intent();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            intent.setAction(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+            intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, getPackageName());
+        } else {
+            intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+        }
+        startActivity(intent);
     }
 
     public void DeleteScrapeResults(View view) {

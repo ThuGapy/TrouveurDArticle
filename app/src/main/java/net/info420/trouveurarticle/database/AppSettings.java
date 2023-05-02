@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 public class AppSettings {
+    public static final int INTERNET_PERMISSION = 1;
+    public static final int SETTINGS_PERMISSION = 2;
     private static final String PREF_REFRESH_TIME = "refresh_time";
     public static final int DefaultRefreshTime = 120;
     private static final String PREF_REFRESH_TIME_CELL_DATA = "refresh_time_cell_data";
@@ -89,6 +91,10 @@ public class AppSettings {
 
     public void addPermissionDeniedAmount() {
         sharedPreferences.edit().putInt(PREF_OPTION_DENIED_AMOUNT, sharedPreferences.getInt(PREF_OPTION_DENIED_AMOUNT, 0) + 1).apply();
+    }
+    public int createNewNotification() {
+        sharedPreferences.edit().putInt("NOTIFICATION_ID", sharedPreferences.getInt("NOTIFICATION_ID", 0) + 1);
+        return sharedPreferences.getInt("NOTIFICATION_ID", 1);
     }
 
     public void ResetSettings() {
