@@ -218,7 +218,7 @@ public class AppSettings {
      * @return int, l'ID de la notification
      */
     public int createNewNotification() {
-        sharedPreferences.edit().putInt("NOTIFICATION_ID", sharedPreferences.getInt("NOTIFICATION_ID", 0) + 1);
+        sharedPreferences.edit().putInt("NOTIFICATION_ID", sharedPreferences.getInt("NOTIFICATION_ID", 0) + 1).apply();
         return sharedPreferences.getInt("NOTIFICATION_ID", 1);
     }
 
