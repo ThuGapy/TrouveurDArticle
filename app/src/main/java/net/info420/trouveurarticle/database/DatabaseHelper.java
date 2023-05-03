@@ -93,18 +93,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String query = "SELECT p.id as _id, p.nomArticle, p.prix, " +
-                "       (SELECT link FROM scrape_results WHERE link = p.amazon) AS amazon_link," +
-                "       (SELECT instock FROM scrape_results WHERE link = p.amazon) AS amazon_stock," +
-                "       (SELECT prix FROM scrape_results WHERE link = p.amazon) AS amazon_price," +
-                "       (SELECT link FROM scrape_results WHERE link = p.newegg) AS newegg_link," +
-                "       (SELECT instock FROM scrape_results WHERE link = p.newegg) AS newegg_stock," +
-                "       (SELECT prix FROM scrape_results WHERE link = p.newegg) AS newegg_price," +
-                "       (SELECT link FROM scrape_results WHERE link = p.canadacomputers) AS canadacomputers_link," +
-                "       (SELECT instock FROM scrape_results WHERE link = p.canadacomputers) AS canadacomputers_stock," +
-                "       (SELECT prix FROM scrape_results WHERE link = p.canadacomputers) AS canadacomputers_price," +
-                "       (SELECT link FROM scrape_results WHERE link = p.memoryexpress) AS memoryexpress_link," +
-                "       (SELECT instock FROM scrape_results WHERE link = p.memoryexpress) AS memoryexpress_stock," +
-                "       (SELECT prix FROM scrape_results WHERE link = p.memoryexpress) AS memoryexpress_price" +
+                "       (SELECT link FROM scrape_results WHERE link = p.amazon ORDER BY id DESC LIMIT 1) AS amazon_link," +
+                "       (SELECT instock FROM scrape_results WHERE link = p.amazon ORDER BY id DESC LIMIT 1) AS amazon_stock," +
+                "       (SELECT prix FROM scrape_results WHERE link = p.amazon ORDER BY id DESC LIMIT 1) AS amazon_price," +
+                "       (SELECT link FROM scrape_results WHERE link = p.newegg ORDER BY id DESC LIMIT 1) AS newegg_link," +
+                "       (SELECT instock FROM scrape_results WHERE link = p.newegg ORDER BY id DESC LIMIT 1) AS newegg_stock," +
+                "       (SELECT prix FROM scrape_results WHERE link = p.newegg ORDER BY id DESC LIMIT 1) AS newegg_price," +
+                "       (SELECT link FROM scrape_results WHERE link = p.canadacomputers ORDER BY id DESC LIMIT 1) AS canadacomputers_link," +
+                "       (SELECT instock FROM scrape_results WHERE link = p.canadacomputers ORDER BY id DESC LIMIT 1) AS canadacomputers_stock," +
+                "       (SELECT prix FROM scrape_results WHERE link = p.canadacomputers ORDER BY id DESC LIMIT 1) AS canadacomputers_price," +
+                "       (SELECT link FROM scrape_results WHERE link = p.memoryexpress ORDER BY id DESC LIMIT 1) AS memoryexpress_link," +
+                "       (SELECT instock FROM scrape_results WHERE link = p.memoryexpress ORDER BY id DESC LIMIT 1) AS memoryexpress_stock," +
+                "       (SELECT prix FROM scrape_results WHERE link = p.memoryexpress ORDER BY id DESC LIMIT 1) AS memoryexpress_price" +
                 " FROM produits AS p";
 
         return new CursorWrapper(db.rawQuery(query, null), db);

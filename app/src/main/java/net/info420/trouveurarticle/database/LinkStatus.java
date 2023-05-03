@@ -1,5 +1,7 @@
 package net.info420.trouveurarticle.database;
 
+import android.text.TextUtils;
+
 import net.info420.trouveurarticle.scrappers.StoreFront;
 
 import java.sql.Time;
@@ -70,6 +72,9 @@ public class LinkStatus implements Comparable<LinkStatus> {
     private Date convertToDate(String date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         try {
+            if(TextUtils.isEmpty(date)) {
+                return null;
+            }
             return dateFormat.parse(date);
         } catch (ParseException e) {
             e.printStackTrace();
