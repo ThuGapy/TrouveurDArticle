@@ -30,9 +30,7 @@ public class AmazonScrapper extends Scrapper{
             Element stockElement = availabilityElement.selectFirst("span.a-color-attainable");
             String stockText = stockElement.text();
             isInStock = stockText.toLowerCase().contains("in stock");
-        } catch (NullPointerException e) {
-            return null;
-        }
+        } catch (NullPointerException e) {}
 
         // Obtention du prix
         try {
