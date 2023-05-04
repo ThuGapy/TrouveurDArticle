@@ -197,7 +197,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         lineChart.getAxisRight().setEnabled(false);
 
         double targetPrice = dbHelper.getTargetPrice(ID);
-        LimitLine targetLine = new LimitLine((float)targetPrice, Utils.getResourceString(getApplicationContext(), R.string.prix_desire));
+        LimitLine targetLine = new LimitLine((float)targetPrice, Utils.getResourceString(getApplicationContext(), R.string.prix_desire) + " (" + Utils.FormatPrice(targetPrice) + ")");
         targetLine.setLineColor(Color.BLACK);
         targetLine.setLineWidth(1f);
         targetLine.setTextColor(Color.BLACK);
