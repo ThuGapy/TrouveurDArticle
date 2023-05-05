@@ -221,7 +221,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         Intent intent = new Intent(getApplicationContext(), Settings.class);
         intent.putExtra("fromProduct", true);
         intent.putExtra("productID", ID);
-        Utils.OpenSettings(getApplicationContext(), preferences, intent);
+        Utils.OpenSettings(this, getApplicationContext(), preferences, intent);
     }
 
     @Override

@@ -105,13 +105,13 @@ public class Utils {
         return false;
     }
 
-    public static void OpenSettings(Context context, AppSettings preferences, Intent intent) {
+    public static void OpenSettings(Activity activity, Context context, AppSettings preferences, Intent intent) {
         if (ContextCompat.checkSelfPermission(context, "net.info420.trouveurarticle.permissions.OPTION_PERMISSION") != PackageManager.PERMISSION_GRANTED) {
             System.out.println(preferences.getPermissionDeniedAmount());
             if (preferences.getPermissionDeniedAmount() > 0) {
                 Utils.ShowPermissionReason(context);
             } else {
-                ActivityCompat.requestPermissions((Activity) context, new String[]{"net.info420.trouveurarticle.permissions.OPTION_PERMISSION"}, SETTINGS_PERMISSION);
+                ActivityCompat.requestPermissions(activity, new String[]{"net.info420.trouveurarticle.permissions.OPTION_PERMISSION"}, SETTINGS_PERMISSION);
             }
         } else {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

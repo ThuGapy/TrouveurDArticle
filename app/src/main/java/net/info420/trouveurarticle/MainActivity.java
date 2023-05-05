@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
 
     private void Settings(View view) {
         Intent intent = new Intent(this, Settings.class);
-        Utils.OpenSettings(getApplicationContext(), preferences, intent);
+        Utils.OpenSettings(this, getApplicationContext(), preferences, intent);
     }
 
     @Override
