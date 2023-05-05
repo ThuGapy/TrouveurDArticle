@@ -241,7 +241,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ScrapperResult getPreviousResult(String link) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String query = "SELECT instock, prix FROM scrape_results WHERE link = '" + link + "'";
+        String query = "SELECT instock, prix FROM scrape_results WHERE link = '" + link + "' ORDER BY id DESC LIMIT 1";
         Cursor cursor = db.rawQuery(query, null);
 
         ScrapperResult result = null;
