@@ -36,6 +36,8 @@ public class CanadaComputersScrapper extends Scrapper{
         if(stockElement != null) {
             String stockString = stockElement.text();
             inStock = stockString.toLowerCase().contains("available to ship");
+        } else {
+            return null;
         }
 
         return new ScrapperResult(inStock, price);

@@ -29,7 +29,9 @@ public class NeweggScrapper extends Scrapper{
             String availabilityText = availabilityElement.text();
 
             isInStock = availabilityText.toLowerCase().contains("in stock");
-        } catch (NullPointerException e) {}
+        } catch (NullPointerException e) {
+            return null;
+        }
 
         // Obtention du prix
         try {
