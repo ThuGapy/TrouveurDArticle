@@ -155,8 +155,6 @@ public class ScrappingService extends Service {
                                     throw new RuntimeException(e);
                                 }
                             }
-
-                            produitCursor.Close();
                         }
                     }).start();
                 }

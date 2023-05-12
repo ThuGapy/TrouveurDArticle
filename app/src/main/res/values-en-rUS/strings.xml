@@ -9,7 +9,7 @@
     <string name="d_sactiver_le_rafraichissement_cell">Disable refresh when the device is on cell data</string>
     <string name="d_sactiver_le_rafraichissement_low_battery">Disable refresh when the battery is low (20% or less)</string>
     <string name="remplacer_automatiquement_le_nom_du_produit">Automatically replace the product name</string>
-    <string name="automatiquement_rafraichir_la_page_d_accueil">Automatically refresh the home screen every 10 seconds</string>
+    <string name="automatiquement_rafraichir_la_page_d_accueil">Automatically refresh the data every 10 seconds</string>
     <string name="donner_les_permissions_de_notifications">Give notifications permission</string>
     <string name="supprimer_les_donn_es_des_pages_de_produits">Delete products page data</string>
     <string name="vider">Empty</string>

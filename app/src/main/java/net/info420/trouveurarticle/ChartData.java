@@ -162,7 +162,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
     public void onDestroy() {
         super.onDestroy();
 
-        if (refreshHandler != null && refreshRunnable != null) {
+        if (refreshHandler != null || refreshRunnable != null) {
             refreshHandler.removeCallbacks(refreshRunnable);
         }
     }

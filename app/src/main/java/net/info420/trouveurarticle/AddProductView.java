@@ -96,6 +96,14 @@ public class AddProductView extends Fragment {
 
         productPrice = fragmentView.findViewById(R.id.price_textbox);
 
+        ImageButton clearPriceButton = fragmentView.findViewById(R.id.price_clear_button);
+        clearPriceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClearPriceTextBox();
+            }
+        });
+
         if(editMode) {
             CursorWrapper wrapper = dbHelper.getItem(editId);
 
@@ -183,7 +191,7 @@ public class AddProductView extends Fragment {
                             wantedPrice = Double.parseDouble(String.valueOf(productPrice.getText()));
                         } catch(NumberFormatException ex) {}
 
-                        if(!productNameString.equals("") && wantedPrice != 0 && (!amazonLink.equals("") || !neweggLink.equals("") || !canadacomputersLink.equals("") || !memoryExpressLink.equals(""))) {
+                        if(!productNameString.equals("") && wantedPrice != 0 && !productPrice.getText().equals("") && (!amazonLink.equals("") || !neweggLink.equals("") || !canadacomputersLink.equals("") || !memoryExpressLink.equals(""))) {
                             String stringToAdd = productNameString;
                             if(preferences.getAutomaticallyReplaceProductName()) {
                                 if(!TextUtils.isEmpty(fetchedString)) {

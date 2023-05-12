@@ -9,7 +9,7 @@
     <string name="d_sactiver_le_rafraichissement_cell">Désactiver le rafraichissement lors d\'utilisation de données cellulaires</string>
     <string name="d_sactiver_le_rafraichissement_low_battery">Désactiver le rafraichissement lorsque la batterie est faible (20% et moins)</string>
     <string name="remplacer_automatiquement_le_nom_du_produit">Remplacer automatiquement le nom du produit par celui de la page web</string>
-    <string name="automatiquement_rafraichir_la_page_d_accueil">Automatiquement rafraichir la page d\'accueil chaque 10 secondes</string>
+    <string name="automatiquement_rafraichir_la_page_d_accueil">Automatiquement rafraichir les données chaque 10 secondes</string>
     <string name="donner_les_permissions_de_notifications">Donner les permissions de notifications</string>
     <string name="supprimer_les_donn_es_des_pages_de_produits">Supprimer les données des pages de produits</string>
     <string name="vider">Vider</string>
