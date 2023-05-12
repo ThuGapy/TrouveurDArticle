@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
+import android.database.CursorIndexOutOfBoundsException;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -160,18 +161,20 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
         if (refreshHandler != null || refreshRunnable != null) {
             refreshHandler.removeCallbacks(refreshRunnable);
         }
+
+        super.onDestroy();
     }
 
     public void Refresh() {
-        List<LinkStatus> statusList = dbHelper.getStoreFrontStatus(ID);
-        adapter = new PriceHistoryAdapter(getApplicationContext(), 0, statusList, (OnProductInteractionListener) this);
-        ListView itemView = findViewById(R.id.historique);
-        itemView.setAdapter(adapter);
+        try {
+            List<LinkStatus> statusList = dbHelper.getStoreFrontStatus(ID);
+            adapter = new PriceHistoryAdapter(getApplicationContext(), 0, statusList, (OnProductInteractionListener) this);
+            ListView itemView = findViewById(R.id.historique);
+            itemView.setAdapter(adapter);
+        } catch (CursorIndexOutOfBoundsException ex) {}
     }
 
     public void RefreshChart() {

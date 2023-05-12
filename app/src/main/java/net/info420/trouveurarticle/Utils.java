@@ -107,9 +107,8 @@ public class Utils {
 
     public static void OpenSettings(Activity activity, Context context, AppSettings preferences, Intent intent) {
         if (ContextCompat.checkSelfPermission(context, "net.info420.trouveurarticle.permissions.OPTION_PERMISSION") != PackageManager.PERMISSION_GRANTED) {
-            System.out.println(preferences.getPermissionDeniedAmount());
             if (preferences.getPermissionDeniedAmount() > 0) {
-                Utils.ShowPermissionReason(context);
+                Utils.ShowPermissionReason(activity, context);
             } else {
                 ActivityCompat.requestPermissions(activity, new String[]{"net.info420.trouveurarticle.permissions.OPTION_PERMISSION"}, SETTINGS_PERMISSION);
             }
@@ -119,20 +118,20 @@ public class Utils {
         }
     }
 
-    public static void ShowPermissionReason(Context context) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    public static void ShowPermissionReason(Activity activity, Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(Utils.getResourceString(context, R.string.cette_application_besoin_permission))
-                .setPositiveButton(Utils.getResourceString(context, R.string.ouvrir_les_parametres), (dialog, which) -> OpenAppSettings(context))
+                .setPositiveButton(Utils.getResourceString(context, R.string.ouvrir_les_parametres), (dialog, which) -> OpenAppSettings(activity, context))
                 .setNegativeButton(Utils.getResourceString(context, R.string.annuler), (dialog, which) -> dialog.dismiss())
                 .create()
                 .show();
     }
 
-    public static void OpenAppSettings(Context context) {
+    public static void OpenAppSettings(Activity activity, Context context) {
         Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", context.getPackageName(), null);
         intent.setData(uri);
-        ComponentActivity componentActivity = (ComponentActivity) context;
+        ComponentActivity componentActivity = (ComponentActivity) activity;
         componentActivity.startActivityForResult(intent, SETTINGS_PERMISSION);
     }
 
