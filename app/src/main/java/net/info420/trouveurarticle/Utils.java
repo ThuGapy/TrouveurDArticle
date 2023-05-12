@@ -141,8 +141,7 @@ public class Utils {
     }
 
     public static void SendNotification(String title, String content, Context context, AppSettings preferences) {
-        NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         String channelId = "scrape_result_channel";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
