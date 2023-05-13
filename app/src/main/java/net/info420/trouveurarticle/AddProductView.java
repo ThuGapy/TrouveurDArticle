@@ -1,6 +1,5 @@
 package net.info420.trouveurarticle;
 
-import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -29,7 +28,9 @@ import net.info420.trouveurarticle.scrappers.StoreFront;
 import net.info420.trouveurarticle.views.AddProductButtonGroup;
 import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
+// Classe qui gère le fragment d'ajout de produit
 public class AddProductView extends Fragment {
+    // Déclaration des données membres
     private View fragmentView;
     private DatabaseHelper dbHelper;
     private EditText productName;
@@ -42,13 +43,17 @@ public class AddProductView extends Fragment {
     private int editId;
     private boolean editMode;
 
+    // Constructeur sans argument
     public AddProductView() { }
+    // Constructeur pour modification d'un produit
     public AddProductView(int toEditID) {
         Bundle args = new Bundle();
         args.putInt("edit_id", toEditID);
         args.putBoolean("edit_mode", true);
         this.setArguments(args);
     }
+
+    // Lorsqu'on crée le fragment, on valide si on est en mode édition ou non
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +64,7 @@ public class AddProductView extends Fragment {
         }
     }
 
+    // Lorsque la vu est créé
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_add_product_view, container, false);
@@ -66,6 +72,7 @@ public class AddProductView extends Fragment {
         dbHelper = new DatabaseHelper(getActivity());
         preferences = new AppSettings(getContext());
 
+        // Initialisation du bouton pour vider le contenu du nom de produit
         ImageButton product_clear_button = fragmentView.findViewById(R.id.product_name_clear_button);
         product_clear_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +81,7 @@ public class AddProductView extends Fragment {
             }
         });
 
+        // Obtention des vues du fragment
         Button addButton = fragmentView.findViewById(R.id.add_button);
         Button clearButton = fragmentView.findViewById(R.id.clear_button);
         Button modifyButton = fragmentView.findViewById(R.id.save_changes_button);
@@ -96,6 +104,7 @@ public class AddProductView extends Fragment {
 
         productPrice = fragmentView.findViewById(R.id.price_textbox);
 
+        // Initialisation du bouton pour vider le contenu du prix
         ImageButton clearPriceButton = fragmentView.findViewById(R.id.price_clear_button);
         clearPriceButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,14 +113,18 @@ public class AddProductView extends Fragment {
             }
         });
 
+        // Si nous comme en mode édition
         if(editMode) {
+            // On obtient le le produit qu'on veut modifier
             CursorWrapper wrapper = dbHelper.getItem(editId);
 
+            // On modifie le fragment pour le mode édition
             addProductTextView.setText(Utils.getResourceString(getContext(), R.string.modification_un_produit));
             addButton.setVisibility(View.GONE);
             clearButton.setVisibility(View.GONE);
             modifyButton.setVisibility(View.VISIBLE);
 
+            // On met à jour les champs
             productName.setText(wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("nomArticle")));
             amazonButtonGroup.getEditText().setText(wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("amazon")));
             neweggButtonGroup.getEditText().setText(wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("newegg")));
@@ -119,12 +132,14 @@ public class AddProductView extends Fragment {
             memoryExpressButtonGroup.getEditText().setText(wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("memoryexpress")));
             productPrice.setText(String.valueOf(wrapper.cursor.getDouble(wrapper.cursor.getColumnIndexOrThrow("prix"))));
 
+            // Initialisation du bouton modifier
             modifyButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            // On obtient les champs
                             String productNameString = String.valueOf(productName.getText());
                             String amazonLink = String.valueOf(amazonButtonGroup.getEditText().getText());
                             String neweggLink = String.valueOf(neweggButtonGroup.getEditText().getText());
@@ -133,6 +148,7 @@ public class AddProductView extends Fragment {
 
                             String fetchedString = GetProductName();
 
+                            // On valide ce qui est entré
                             double wantedPrice = 0;
                             try {
                                 wantedPrice = Double.parseDouble(String.valueOf(productPrice.getText()));
@@ -148,9 +164,11 @@ public class AddProductView extends Fragment {
                                     }
                                 }
 
+                                // On modifie l'article
                                 dbHelper.updateItem(editId, stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
                                 ShowToast(Utils.getResourceString(getContext(), R.string.produit_modifie));
 
+                                // On retourne au menu principal
                                 OnProductInteractionListener listener = (OnProductInteractionListener) getActivity();
                                 listener.EditDone();
                             } else {
@@ -164,6 +182,7 @@ public class AddProductView extends Fragment {
             wrapper.Close();
         }
 
+        // Initialisation du bouton pour vider les champs
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,12 +191,14 @@ public class AddProductView extends Fragment {
         });
 
 
+        // Initialisation du bouton pour ajouter un article
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        // Obtention des champs
                         String productNameString = String.valueOf(productName.getText());
                         String amazonLink = String.valueOf(amazonButtonGroup.getEditText().getText());
                         String neweggLink = String.valueOf(neweggButtonGroup.getEditText().getText());
@@ -186,6 +207,7 @@ public class AddProductView extends Fragment {
 
                         String fetchedString = GetProductName();
 
+                        // Validation des informations entré
                         double wantedPrice = 0;
                         try {
                             wantedPrice = Double.parseDouble(String.valueOf(productPrice.getText()));
@@ -201,6 +223,7 @@ public class AddProductView extends Fragment {
                                 }
                             }
 
+                            // Ajout du produit dans la BD
                             dbHelper.createNewItem(stringToAdd, amazonLink.equals("") ? null : amazonLink, neweggLink.equals("") ? null : neweggLink, canadacomputersLink.equals("") ? null : canadacomputersLink, memoryExpressLink.equals("") ? null : memoryExpressLink, wantedPrice);
 
                             ShowToast(Utils.getResourceString(getContext(), R.string.produit_ajoute));
@@ -218,15 +241,14 @@ public class AddProductView extends Fragment {
         return fragmentView;
     }
 
+    // Méthode qui obtient le nom du produit
     private String GetProductName() {
-        String productNameString = String.valueOf(productName.getText());
         String amazonLink = String.valueOf(amazonButtonGroup.getEditText().getText());
         String neweggLink = String.valueOf(neweggButtonGroup.getEditText().getText());
         String canadacomputersLink = String.valueOf(canadaComputersButtonGroup.getEditText().getText());
         String memoryExpressLink = String.valueOf(memoryExpressButtonGroup.getEditText().getText());
 
         String fetchedString = null;
-        String productName = productNameString;
 
         if(preferences.getAutomaticallyReplaceProductName()) {
             Scrapper productNameScrapper;
@@ -248,6 +270,7 @@ public class AddProductView extends Fragment {
         return fetchedString;
     }
 
+    // Méthode qui vide tous les champs
     public void ClearInputs() {
         ClearProductNameTextBox();
         amazonButtonGroup.ClearTextBox();
@@ -257,16 +280,19 @@ public class AddProductView extends Fragment {
         ClearPriceTextBox();
     }
 
+    // Méthode qui vide le contenu de la textbox de nom du produit
     public void ClearProductNameTextBox() {
         EditText textbox = fragmentView.findViewById(R.id.product_name_edit);
         textbox.setText("");
     }
 
+    // Méthode qui vide le contenu de la textbox de prix
     public void ClearPriceTextBox() {
         EditText textbox = fragmentView.findViewById(R.id.price_textbox);
         textbox.setText("");
     }
 
+    // Méthode qui sert à montrer un toast
     public void ShowToast(String text) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override

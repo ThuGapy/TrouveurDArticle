@@ -40,13 +40,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+// Classe qui gère le côté BD de l'application
 public class DatabaseHelper extends SQLiteOpenHelper {
+    // Initialisation des données membres
     private static final int DB_VERSION = 4;
     private static final String DB_NAME = "trouveur_article";
     private static final String ITEM_TABLE = "produits";
     private static final String LINK_TABLE = "scrape_results";
     private static final long WeekInMillis = 604800000;
 
+    // Création de la table produits
     private static final String CreateItemTable = "CREATE TABLE " + ITEM_TABLE + "("
             + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
             + "nomArticle TEXT NOT NULL,"
@@ -57,6 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + "prix REAL NOT NULL"
             + ")";
 
+    // Créationde la table des résultats de moisonnage de données
     private static final String CreateLinkTable = "CREATE TABLE " + LINK_TABLE + "("
             + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
             + "link TEXT NOT NULL,"
@@ -65,16 +69,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + "temps TEXT DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime'))"
             + ")";
 
+    // Constructeur de la classe
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
+    // Création des tables
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CreateItemTable);
         db.execSQL(CreateLinkTable);
     }
 
+    // Mise à jour des tables
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + ITEM_TABLE);
@@ -83,12 +90,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    // Obtient tous les produits dans la BD
     public CursorWrapper getAllItems() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(ITEM_TABLE, null, null, null, null, null, "id DESC");
         return new CursorWrapper(cursor, db);
     }
 
+    // Obtient le status de chaque produit dans la BD
     public CursorWrapper getAllItemsStockStatus() {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -106,6 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new CursorWrapper(db.rawQuery(query, null), db);
     }
 
+    // Obtient un produit par son ID
     public CursorWrapper getItem(int ID) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -116,6 +126,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new CursorWrapper(cursor, db);
     }
 
+    // Obtient le nom d'un produit par son ID
     public String getProductName(int ID) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -132,6 +143,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return productName;
     }
 
+    // Obtient les données les plus récent d'un lien
     public CursorWrapper getLatestLinkData(String link) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -147,9 +159,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new CursorWrapper(cursor, db);
     }
 
+    // Obtient le status selon la boutique à partir de l'ID d'un produit
     public List<LinkStatus> getStoreFrontStatus(int ID) {
         List<LinkStatus> statusList = new ArrayList<LinkStatus>();
 
+        // Obtention de l'article et des liens des différentes boutiques
         CursorWrapper wrapper = getItem(ID);
         double prix = wrapper.cursor.getDouble(wrapper.cursor.getColumnIndexOrThrow("prix"));
         String amazonLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("amazon"));
@@ -162,6 +176,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         double price;
         boolean stock;
 
+        // Vérification amazon, si le produit utilise amazon
         if(amazonLink != null) {
             if (!amazonLink.equals("")) {
                 linkData = getLatestLinkData(amazonLink);
@@ -180,6 +195,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        // Vérification newegg, si le produit utilise newegg
         if(neweggLink != null) {
             if (!neweggLink.equals("")) {
                 linkData = getLatestLinkData(neweggLink);
@@ -198,6 +214,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        // Vérification canadacomputers, si le produit utilise canadacomputers
         if(canadaComputersLink != null) {
             if (!canadaComputersLink.equals("")) {
                 linkData = getLatestLinkData(canadaComputersLink);
@@ -216,6 +233,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        // Vérification de memoryexpress, si le produit utilise memoryexpress
         if(memoryExpressLink != null) {
             if (!memoryExpressLink.equals("")) {
                 linkData = getLatestLinkData(memoryExpressLink);
@@ -234,10 +252,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        // Ordre de la liste en fonction du prix et des disponibilités à l'aide de l'interface Comparable
         Collections.sort(statusList);
         return statusList;
     }
 
+    // Fonction qui obtient le précédent résultat d'un lien pour la création d'un résultat de moisonnage de données
     public ScrapperResult getPreviousResult(String link) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -260,6 +280,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    // Obtient le prix désiré d'un article à partir d'un ID
     public double getTargetPrice(int ID) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -279,6 +300,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return price;
     }
 
+    // Obtient si un lien a des données de moisonnages enregistré dans la bd
     public boolean hasScrapeData(String link) {
         SQLiteDatabase db = getReadableDatabase();
         String query = "SELECT COUNT(*) as count FROM scrape_results WHERE link = '" + link + "'";
@@ -298,6 +320,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    // Obtient les données de moisonnage à partir de minuit d'une journée
     public ScrapperResult getStartOfDayResult(String link, Date date) {
         Calendar calendar = Utils.GetStartOfDayCalendar(date);
         long startOfDayTimestamp = calendar.getTimeInMillis();
@@ -323,6 +346,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    // Obtient la ligne de graphique pour un lien
     public LineDataSet getLineDataSet(String link, String nom, int color) {
         List<Entry> entries = new ArrayList<>();
         Calendar currentCalendar = Utils.GetStartOfDayCalendar(new Date());
@@ -352,8 +376,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return dataSet;
     }
 
-
+    // Obtient les données du graphique pour la page "ChartData"
     public LineData getLineData(int ID) {
+        // Obtiention des liens du produit
         CursorWrapper wrapper = getItem(ID);
         String amazonLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("amazon"));
         String neweggLink = wrapper.cursor.getString(wrapper.cursor.getColumnIndexOrThrow("newegg"));
@@ -363,6 +388,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         List<ILineDataSet> dataSets = new ArrayList<>();
 
+        // On crée la ligne amazon si le produit utilise amazon
         if(amazonLink != null) {
             if(!amazonLink.equals("")) {
                 if(hasScrapeData(amazonLink)) {
@@ -370,6 +396,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
             }
         }
+
+        // On crée la ligne newegg si le produit utilise newegg
         if(neweggLink != null) {
             if(!neweggLink.equals("")) {
                 if(hasScrapeData(neweggLink)) {
@@ -378,6 +406,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        // On crée la ligne canacomputers si le produit utilise canadacomputers
         if(canadaComputersLink != null) {
             if(!canadaComputersLink.equals("")) {
                 if(hasScrapeData(canadaComputersLink)) {
@@ -386,6 +415,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        // On crée la ligne memoryexpress si le produit utilise memoryexpress
         if(memoryExpressLink != null) {
             if(!memoryExpressLink.equals("")) {
                 if(hasScrapeData(memoryExpressLink)) {
@@ -398,6 +428,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return lineData;
     }
 
+    // Fonction qui ajoute un nouveau produit à la BD
     public void createNewItem(String productName, String amazon, String newegg, String canadacomputers, String memoryexpress, double prix) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -413,7 +444,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Fonction qui ajoute un résultat de moisonnage dans la base de données
     public void createScrapeResult(String link, ScrapperResult result, String productName, StoreFront storeFront, Context context, AppSettings preferences) {
+        // On détermine si le résultat précédent est pareil
         ScrapperResult previousResult = this.getPreviousResult(link);
         boolean shouldCreateScrapeResult = false;
 
@@ -425,6 +458,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        // On ajoute le résultat à la BD si il n'est pas pareil
         if(shouldCreateScrapeResult) {
             System.out.println("Adding new scrape result for " + link);
             System.out.println(result.GetStringifiedResult());
@@ -464,6 +498,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    // Fonction qui met à jour un produit dans la BD
     public void updateItem(int ID, String productName, String amazon, String newegg, String canadacomputers, String memoryexpress, double prix) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -473,6 +508,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Fonction qui supprime les données de moisonnage relié à un produit
     public void deleteRelatedScrapeResults(int ID) {
         SQLiteDatabase wdb = getWritableDatabase();
         SQLiteDatabase db = getReadableDatabase();
@@ -492,6 +528,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Fonction qui supprime un produit de la BD
     public void deleteItem(int ID) {
         deleteRelatedScrapeResults(ID);
 
@@ -500,12 +537,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // Fonction qui supprime toutes les données de la table "scrape_results" contenant les données de moisonnage
     public void deleteAllScrapeResults() {
         SQLiteDatabase db = getWritableDatabase();
         db.delete("scrape_results", null, null);
         db.close();
     }
 
+    // Fonction qui supprime les données plus vieille qu'une semaine
     public void deleteOlderThanAWeek() {
         SQLiteDatabase db = getWritableDatabase();
         long date = System.currentTimeMillis() - WeekInMillis;

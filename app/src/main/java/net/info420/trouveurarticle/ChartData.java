@@ -46,6 +46,7 @@ import java.sql.Ref;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe qui gère l'activité des données d'un produit
 public class ChartData extends AppCompatActivity implements OnProductInteractionListener {
 
     private DatabaseHelper dbHelper;
@@ -59,12 +60,11 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chart_data);
 
+        // Obtention du produit à voir
         Intent intent = getIntent();
         ID = intent.getIntExtra("productID", 0);
 
         preferences = new AppSettings(this);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
         ImageButton goBackButton = findViewById(R.id.go_back_button);
         goBackButton.setVisibility(View.VISIBLE);
         goBackButton.setOnClickListener(new View.OnClickListener() {
@@ -77,6 +77,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
 
         ImageButton settingsButton = findViewById(R.id.settings_button);
 
+        // Initialisation du menu d'options
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,19 +126,17 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) textLayout.getLayoutParams();
         layoutParams.setMarginStart((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics()));
 
-        TextView toolbarTitle = findViewById(R.id.toolbar_title);
-        toolbarTitle.setText(Utils.getResourceString(getApplicationContext(), R.string.app_name));
-
-        TextView toolbarSubtitle = findViewById(R.id.toolbar_subtitle);
-        toolbarSubtitle.setText(Utils.getResourceString(getApplicationContext(), R.string.suivi_du_status_de_larticle));
-
+        // Initialisation de la toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        UpdateToolbarText();
 
         TextView productNameTitle = findViewById(R.id.product_name_title);
 
         dbHelper = new DatabaseHelper(getApplicationContext());
         RefreshChart();
 
+        // Obtention des données si l'ID n'est pas 0
         if(ID != 0) {
             String productName = dbHelper.getProductName(ID);
             productNameTitle.setText(productName);
@@ -159,6 +158,15 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         }
     }
 
+    // Méthode qui met à jour le texte de la toolbar avec la bonne traduction
+    private void UpdateToolbarText() {
+        TextView toolbarTitle = findViewById(R.id.toolbar_title);
+        toolbarTitle.setText(Utils.getResourceString(getApplicationContext(), R.string.app_name));
+        TextView toolbarSubtitle = findViewById(R.id.toolbar_subtitle);
+        toolbarSubtitle.setText(Utils.getResourceString(getApplicationContext(), R.string.suivi_du_status_de_larticle));
+    }
+
+    // Supprimer le rafraichissement automatique si il est activé
     @Override
     public void onDestroy() {
         if (refreshHandler != null || refreshRunnable != null) {
@@ -168,6 +176,14 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         super.onDestroy();
     }
 
+    // Met le texte de la toolbar à jour avec la bonne traduction
+    @Override
+    protected void onResume() {
+        super.onResume();
+        UpdateToolbarText();
+    }
+
+    // Rafraichi l'historique des boutiques
     public void Refresh() {
         try {
             List<LinkStatus> statusList = dbHelper.getStoreFrontStatus(ID);
@@ -177,6 +193,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         } catch (CursorIndexOutOfBoundsException ex) {}
     }
 
+    // Rafraichi les données du graphique
     public void RefreshChart() {
         LineChart lineChart = findViewById(R.id.line_chart);
         lineChart.getDescription().setEnabled(false);
@@ -188,10 +205,11 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         Legend legend = lineChart.getLegend();
         legend.setTextSize(12f);
 
+        // Obtention des données du graphique à partir de la BD
         LineData lineData = dbHelper.getLineData(ID);
-
         lineChart.setData(lineData);
 
+        // Formattage des $ sur l'axe des Y
         YAxis leftAxis = lineChart.getAxisLeft();
         leftAxis.setDrawZeroLine(true);
         leftAxis.setZeroLineColor(Color.BLACK);
@@ -199,6 +217,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         leftAxis.setValueFormatter(new DollarFormatter(Axis.Y));
         lineChart.getAxisRight().setEnabled(false);
 
+        // Ajout du prix désiré
         double targetPrice = dbHelper.getTargetPrice(ID);
         LimitLine targetLine = new LimitLine((float)targetPrice, Utils.getResourceString(getApplicationContext(), R.string.prix_desire) + " (" + Utils.FormatPrice(targetPrice) + ")");
         targetLine.setLineColor(Color.BLACK);
@@ -209,6 +228,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
 
         leftAxis.addLimitLine(targetLine);
 
+        // Formattage des jours sur l'axe des X
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
@@ -217,9 +237,11 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
         xAxis.setTextSize(12f);
         xAxis.setValueFormatter(new DayOfWeekFormatter());
 
+        // On invalide le graphique pour le mettre à jour
         lineChart.invalidate();
     }
 
+    // Ouverture des paramètres de l'application
     public void Settings(View view) {
         Intent intent = new Intent(getApplicationContext(), Settings.class);
         intent.putExtra("fromProduct", true);
@@ -237,6 +259,7 @@ public class ChartData extends AppCompatActivity implements OnProductInteraction
 
     }
 
+    // Ouverture du lien d'une boutique
     @Override
     public void OpenLink(String link) {
         if(link.equals("")) return;

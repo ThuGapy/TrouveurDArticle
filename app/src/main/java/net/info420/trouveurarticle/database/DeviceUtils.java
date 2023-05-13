@@ -7,15 +7,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
 
-/**
- * Classe qui gère des utilitaires relié à l'appareil
- */
+// Classe d'utilitaire pour obtenir des informations sur l'appareil
 public class DeviceUtils {
-    /**
-     * Méthode qui obtient si l'appareil est présentement branché
-     * @param context Contexte de l'application
-     * @return boolean, Si l'appareil est branché
-     */
+    // Fonction qui détermine si l'appareil est branché
     public static boolean IsDevicePluggedIn(Context context) {
         // Obtention du status de la batterie
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
@@ -30,11 +24,7 @@ public class DeviceUtils {
         return false; // L'appareil n'est pas branché
     }
 
-    /**
-     * Méthode qui obtient si l'appareil utilise des données cellulaire
-     * @param context Contexte de l'application
-     * @return boolean, Si l'appareil utilise des données cellulaire
-     */
+    // Fonction qui détermine si l'appareil utilise des données cellulaire
     public static boolean IsDeviceUsingCellularData(Context context) {
         // Obtention du manager de connectivité
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -48,11 +38,7 @@ public class DeviceUtils {
         return false; // L'appareil n'utilise pas de données cellulaires
     }
 
-    /**
-     * Méthode qui obtient si le niveau de la batterie de l'appareil est faible
-     * @param context Contexte de l'application
-     * @return boolean, Si le niveau de la batterie de l'appareil est faible
-     */
+    // Fonction qui détermine si la batterie est faible
     public static boolean IsDeviceBatteryLow(Context context) {
         // Obtention du status de la batterie
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);

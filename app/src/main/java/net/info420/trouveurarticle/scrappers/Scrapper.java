@@ -1,31 +1,22 @@
 package net.info420.trouveurarticle.scrappers;
 
-import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-
-import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 
+// Classe abstraite pour les moisonneurs de données
 public abstract class Scrapper {
+    // Fonction qui nétoie un lien
     public static String LinkCleaner(String link) {
         return link;
     }
+
+    // Méthode qui obtient le Document (HTML) d'une page
     protected Document GetDocument(String link) {
         try {
             // Crée la connection avec des headers similaires à une vrai connection
@@ -50,19 +41,23 @@ public abstract class Scrapper {
         }
     }
 
+    // Méthode abstraite pour l'obtention d'informations sur les produits
     public abstract ScrapperResult Fetch(Document doc);
     public abstract String FetchProductName(Document doc);
 
+    // Méthode qui obtient les informations de produit
     public ScrapperResult Fetch(String link) {
         Document document = GetDocument(link);
         return document == null ? null : Fetch(document);
     };
 
+    // Méthode qui retourne le nom du produit
     public String FetchProductName(String link) {
         Document document = GetDocument(link);
         return document == null ? "" : FetchProductName(document);
     }
 
+    // Fonction qui retourne un agent d'utilise aléatoire
     private static String getRandomUserAgent() {
         List<String> userAgents = Arrays.asList(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0",

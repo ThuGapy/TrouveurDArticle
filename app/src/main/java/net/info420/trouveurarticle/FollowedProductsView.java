@@ -18,7 +18,9 @@ import net.info420.trouveurarticle.database.FollowedItemAdapter;
 import net.info420.trouveurarticle.views.OnRefreshRequestedListener;
 import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
+// Classe qui gère le fragment des produits suivi
 public class FollowedProductsView extends Fragment implements OnRefreshRequestedListener {
+    // Déclaration des données membres
     private View fragmentView;
     private DatabaseHelper dbHelper;
     private CursorWrapper dataCursor;
@@ -32,15 +34,18 @@ public class FollowedProductsView extends Fragment implements OnRefreshRequested
         super.onCreate(savedInstanceState);
     }
 
+    // Lorsque le fragment est créé
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_followed_products, container, false);
 
         preferences = new AppSettings(getContext());
 
+        // Initialisation de la classe DatabaseHelper et rafraichissement de l'adapter
         dbHelper = new DatabaseHelper(getContext());
         Refresh();
 
+        // Initialisation du bouton rafraichir
         ImageButton refreshButton = fragmentView.findViewById(R.id.refresh_button);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,6 +54,7 @@ public class FollowedProductsView extends Fragment implements OnRefreshRequested
             }
         });
 
+        // On crée le rafraichissement automatique si il est activé dans les paramètres
         if(preferences.getAutomaticallyRefreshData()) {
             refreshHandler = new Handler();
             refreshRunnable = new Runnable() {
@@ -65,6 +71,7 @@ public class FollowedProductsView extends Fragment implements OnRefreshRequested
         return fragmentView;
     }
 
+    // Rafraichir l'adapter de la listview
     public void Refresh() {
         dataCursor = dbHelper.getAllItemsStockStatus();
         itemAdapter = new FollowedItemAdapter(getActivity(), dataCursor, (OnProductInteractionListener) getActivity(), (OnRefreshRequestedListener) this);
@@ -72,6 +79,7 @@ public class FollowedProductsView extends Fragment implements OnRefreshRequested
         itemView.setAdapter(itemAdapter);
     }
 
+    // Supression du rafraichissement automatique si il est activé
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -85,6 +93,7 @@ public class FollowedProductsView extends Fragment implements OnRefreshRequested
         }
     }
 
+    // Rafraichir lorsque demandé
     @Override
     public void RequestRefresh() {
         Refresh();

@@ -16,7 +16,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+// Classe qui gère le status d'un lien
 public class LinkStatus implements Comparable<LinkStatus> {
+    // Déclartion des données membres
     public boolean EnStock;
     public double Prix;
     public Date TimeStamp;
@@ -24,7 +26,7 @@ public class LinkStatus implements Comparable<LinkStatus> {
     public StoreFront Boutique;
     private PriceStatus status = PriceStatus.NO_DATA;
 
-
+    // Constructeur de la classe
     public LinkStatus(boolean stock, double price, String time, String link, StoreFront storeFront) {
         EnStock = stock;
         Prix = price;
@@ -33,6 +35,7 @@ public class LinkStatus implements Comparable<LinkStatus> {
         Boutique = storeFront;
     }
 
+    // Classe qui détermine le status du lien
     public void DetermineStatus(double desiredPrice) {
         if(EnStock && Prix <= desiredPrice) {
             status = PriceStatus.GOOD;
@@ -58,6 +61,7 @@ public class LinkStatus implements Comparable<LinkStatus> {
         }
     }
 
+    // Classe qui compare les liens entre eu
     @Override
     public int compareTo(LinkStatus linkStatus) {
         if(this.EnStock && !linkStatus.EnStock) {
@@ -69,6 +73,7 @@ public class LinkStatus implements Comparable<LinkStatus> {
         }
     }
 
+    // Méthode qui converti une string de date en date Java
     private Date convertToDate(String date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         try {

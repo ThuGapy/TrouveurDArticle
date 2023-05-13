@@ -7,8 +7,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -23,9 +21,10 @@ import net.info420.trouveurarticle.database.DatabaseHelper;
 import net.info420.trouveurarticle.database.DeviceUtils;
 import net.info420.trouveurarticle.database.LowBatteryReceiver;
 
+// Classe qui gère le service d'avant plan de l'application
 public class ScrappingService extends Service {
+    // Déclaration des données membres
     private DatabaseHelper dbHelper;
-    private SQLiteDatabase database;
     private AppSettings preferences;
     private Handler serviceHandler;
     private Runnable serviceRunnable;
@@ -33,6 +32,7 @@ public class ScrappingService extends Service {
     private int currentInterval;
     private LowBatteryReceiver receiver;
 
+    // Initialisation des données membres et du service d'avant plan
     @Override
     public void onCreate() {
         super.onCreate();
@@ -48,13 +48,14 @@ public class ScrappingService extends Service {
         registerReceiver(receiver, filter);
     }
 
+    // Lorsque le service commence, on valide que celui-ci devrait être executer, sinon on commence le service "d'attente"
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         GetShouldBeInterval();
         CancelCurrentRunnable();
 
         if(shouldFetchData) {
-            ScheduleService(currentInterval);
+            ScheduleService();
         } else {
             SchedulePendingService();
         }
@@ -66,6 +67,7 @@ public class ScrappingService extends Service {
         return null;
     }
 
+    // On supprime le receiver lorsque le service est supprimé
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -73,7 +75,8 @@ public class ScrappingService extends Service {
         unregisterReceiver(receiver);
     }
 
-    private void ScheduleService(int interval) {
+    private void ScheduleService() {
+        // Création d'un runnable pour le service de suivi
         serviceRunnable = new Runnable() {
             @Override
             public void run() {
@@ -87,12 +90,14 @@ public class ScrappingService extends Service {
                         @Override
                         public void run() {
                             while(produitCursor.cursor.moveToNext()) {
+                                // On obtient les informations du produit
                                 String nomProduit = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("nomArticle"));
                                 String amazonLink = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("amazon"));
                                 String neweggLink = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("newegg"));
                                 String canadaComputersLink = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("canadacomputers"));
                                 String memoryExpressLink = produitCursor.cursor.getString(produitCursor.cursor.getColumnIndexOrThrow("memoryexpress"));
 
+                                // On lance un nouveau fil (thread) pour amazon si le produit en a besoin
                                 if(amazonLink != null && !amazonLink.equals("")) {
                                     new Thread(new Runnable() {
                                         @Override
@@ -107,6 +112,7 @@ public class ScrappingService extends Service {
                                     }).start();
                                 }
 
+                                // On lance un nouveau fil (thread) pour newegg si le produit en a besoin
                                 if(neweggLink != null && !neweggLink.equals("")) {
                                     new Thread(new Runnable() {
                                         @Override
@@ -121,6 +127,7 @@ public class ScrappingService extends Service {
                                     }).start();
                                 }
 
+                                // On lance un nouveau fil (thread) pour canadacomputers si le produit en a besoin
                                 if(canadaComputersLink != null && !canadaComputersLink.equals("")) {
                                     new Thread(new Runnable() {
                                         @Override
@@ -135,6 +142,7 @@ public class ScrappingService extends Service {
                                     }).start();
                                 }
 
+                                // On lance un nouveau fil (thread) pour memoryexpress si le produit en a besoin
                                 if(memoryExpressLink != null && !memoryExpressLink.equals("")) {
                                     new Thread(new Runnable() {
                                         @Override
@@ -150,6 +158,7 @@ public class ScrappingService extends Service {
                                 }
 
                                 try {
+                                    // On attend 2.5sec entre chaque article pour éviter de se faire détecter comme un robot
                                     Thread.sleep(2500);
                                 } catch (InterruptedException e) {
                                     throw new RuntimeException(e);
@@ -158,13 +167,15 @@ public class ScrappingService extends Service {
                         }
                     }).start();
                 }
+
+                // Si on doit arreter de suivre les articles, on lance le service d'attente, sinon on continue
                 if (!shouldFetchData) {
                     CancelCurrentRunnable();
                     SchedulePendingService();
                 } else {
                     if (previousInterval != currentInterval) {
                         CancelCurrentRunnable();
-                        ScheduleService(currentInterval);
+                        ScheduleService();
                     } else {
                         serviceHandler.postDelayed(serviceRunnable, currentInterval * 1000);
                     }
@@ -172,9 +183,11 @@ public class ScrappingService extends Service {
             }
         };
 
+        // On lance le runnable
         serviceHandler.post(serviceRunnable);
     }
 
+    // Méthode qui correspond au service d'attente, regarde à chaque 10 secondes si le service de suivi devrait être relancé
     private void SchedulePendingService() {
         serviceRunnable = new Runnable() {
             @Override
@@ -184,7 +197,7 @@ public class ScrappingService extends Service {
 
                 if(shouldFetchData) {
                     CancelCurrentRunnable();
-                    ScheduleService(currentInterval);
+                    ScheduleService();
                 }
                 serviceHandler.postDelayed(this, 10000);
             }
@@ -196,6 +209,7 @@ public class ScrappingService extends Service {
         serviceHandler.removeCallbacks(serviceRunnable);
     }
 
+    // Méthode qui calcul l'interval que le service devrait être executer
     private void GetShouldBeInterval() {
         int interval;
         boolean batteryLow = DeviceUtils.IsDeviceBatteryLow(getApplicationContext());
@@ -228,6 +242,7 @@ public class ScrappingService extends Service {
         shouldFetchData = interval != 0;
     }
 
+    // Méthode qui crée le canal de notification pour le service
     private void CreateNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = Utils.getResourceString(context, R.string.service_de_suivi);
@@ -244,6 +259,7 @@ public class ScrappingService extends Service {
         }
     }
 
+    // Méthode qui crée la notification d'execution
     private Notification CreateNotification(Context context) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "scrapping_foreground_channel")
                 .setContentTitle(Utils.getResourceString(context, R.string.service_de_suivi))

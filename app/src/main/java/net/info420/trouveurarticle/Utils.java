@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class Utils {
+    // Fonction qui formate le prix (double en string)
     public static String FormatPrice(double price) {
         String priceTotal = String.valueOf((int)Math.floor(price));
         String priceDecimalText = String.valueOf(price);
@@ -50,11 +51,7 @@ public class Utils {
         }
     }
 
-    public static long GetStartOfDayTimeStamp(Date date) {
-        Calendar calendar = GetStartOfDayCalendar(date);
-        return calendar.getTimeInMillis();
-    }
-
+    // Fonctui qui obtient un calendrier à une date spécifié à minuit
     public static Calendar GetStartOfDayCalendar(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -65,15 +62,7 @@ public class Utils {
         return calendar;
     }
 
-    public static String getFormattedTime(Date date) {
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            return dateFormat.format(date);
-        } catch(NullPointerException ex) {
-            return "";
-        }
-    }
-
+    // Fonction qui arrête tous les services de suivi
     public static void StopAllRunningScrappingService(Context context) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         ComponentName componentName = new ComponentName(context, ScrappingService.class);
@@ -92,6 +81,7 @@ public class Utils {
         }
     }
 
+    // Fonction qui détermine si un service de suivi est en train de tourner
     public static boolean IsScrappingServiceRunning(Context context) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if(activityManager != null) {
@@ -105,6 +95,7 @@ public class Utils {
         return false;
     }
 
+    // Fonction qui ouvre le menu de paramètres si l'utilisateur a la permission
     public static void OpenSettings(Activity activity, Context context, AppSettings preferences, Intent intent) {
         if (ContextCompat.checkSelfPermission(context, "net.info420.trouveurarticle.permissions.OPTION_PERMISSION") != PackageManager.PERMISSION_GRANTED) {
             if (preferences.getPermissionDeniedAmount() > 0) {
@@ -118,6 +109,7 @@ public class Utils {
         }
     }
 
+    // Fonction qui montre la raison du besoin de permission à l'utilisateur
     public static void ShowPermissionReason(Activity activity, Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(Utils.getResourceString(context, R.string.cette_application_besoin_permission))
@@ -127,6 +119,7 @@ public class Utils {
                 .show();
     }
 
+    // Fonction qui ouvre les paramètres de l'applicatio au niveau d'android
     public static void OpenAppSettings(Activity activity, Context context) {
         Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", context.getPackageName(), null);
@@ -135,14 +128,17 @@ public class Utils {
         componentActivity.startActivityForResult(intent, SETTINGS_PERMISSION);
     }
 
+    // Fonction qui valide si les notifications sont activés
     public static boolean AreNotificationsEnabled(Context context) {
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         return notificationManagerCompat.areNotificationsEnabled();
     }
 
+    // Foncton qui envoi une notification
     public static void SendNotification(String title, String content, Context context, AppSettings preferences) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        // Crée le canal de notification si il n'existe pas déjà
         String channelId = "scrape_result_channel";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence channelName = Utils.getResourceString(context, R.string.canal_trouveur_article);
@@ -154,6 +150,7 @@ public class Utils {
             notificationManager.createNotificationChannel(channel);
         }
 
+        // Envoie la notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(title)
@@ -163,6 +160,7 @@ public class Utils {
         notificationManager.notify(preferences.createNewNotification(), builder.build());
     }
 
+    // Méthode pour obtenir une resource string (traduction) dans le fichier strings.xml
     public static String getResourceString(Context context, int stringID) {
         return context.getResources().getString(stringID);
     }

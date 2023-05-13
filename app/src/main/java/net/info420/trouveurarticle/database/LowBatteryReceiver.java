@@ -7,9 +7,7 @@ import android.content.Intent;
 import net.info420.trouveurarticle.R;
 import net.info420.trouveurarticle.Utils;
 
-/**
- * Classe qui gère le BroadcastReceiver de batterie faible
- */
+// Classe qui gère le broadcast receiver de batterie faible
 public class LowBatteryReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

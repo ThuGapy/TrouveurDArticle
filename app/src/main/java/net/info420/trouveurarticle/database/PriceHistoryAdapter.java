@@ -19,9 +19,11 @@ import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
 import java.util.List;
 
+// Adapter qui gère l'historique de chaque boutique d'un produit
 public class PriceHistoryAdapter extends ArrayAdapter<LinkStatus> {
     private OnProductInteractionListener productListener;
 
+    // Constructeur de la classe
     public PriceHistoryAdapter(@NonNull Context context, int resource, @NonNull List<LinkStatus> statusList, OnProductInteractionListener listener) {
         super(context, resource, statusList);
         productListener = listener;
@@ -37,9 +39,9 @@ public class PriceHistoryAdapter extends ArrayAdapter<LinkStatus> {
         LinkStatus status = getItem(position);
 
         View colorIndicator = newView.findViewById(R.id.color_indicator);
-
         String nameSuffix = "";
 
+        // On met la couleur de l'idicateur
         switch(status.getStatus()) {
             case GOOD:
                 nameSuffix = " (" + Utils.FormatPrice(status.Prix) + ")";
@@ -59,8 +61,8 @@ public class PriceHistoryAdapter extends ArrayAdapter<LinkStatus> {
                 break;
         }
 
+        // On met le nom et le status
         TextView namePrice = newView.findViewById(R.id.item_name);
-
         switch(status.Boutique) {
             case Amazon:
                 namePrice.setText("Amazon.ca" + nameSuffix);
@@ -76,6 +78,7 @@ public class PriceHistoryAdapter extends ArrayAdapter<LinkStatus> {
                 break;
         }
 
+        // On met un lien si l'article est en stock
         if(status.getStatus() == PriceStatus.GOOD || status.getStatus() == PriceStatus.OVERPRICED) {
             namePrice.setOnClickListener(new View.OnClickListener() {
                 @Override

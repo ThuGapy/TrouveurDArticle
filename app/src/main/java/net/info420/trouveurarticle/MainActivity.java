@@ -27,9 +27,11 @@ import net.info420.trouveurarticle.database.AppSettings;
 import net.info420.trouveurarticle.scrappers.ScrappingService;
 import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
+// Classe qui gère le menu principal de l'application
 public class MainActivity extends AppCompatActivity implements OnProductInteractionListener {
     private AppSettings preferences;
 
+    // Lorsque le menu est créé
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,14 +39,12 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
 
         preferences = new AppSettings(getApplicationContext());
 
+        // On ajoute la toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        UpdateToolbarText();
 
-        TextView toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
-        toolbarTitle.setText(Utils.getResourceString(getApplicationContext(), R.string.app_name));
-        TextView toolbarSubtitle = toolbar.findViewById(R.id.toolbar_subtitle);
-        toolbarSubtitle.setText(Utils.getResourceString(getApplicationContext(), R.string.trouvez_les_articles_en_demande));
-
+        // Initialisation des écouteurs de click du menu d'options
         ImageButton settingsButton = findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,10 +83,12 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
             }
         });
 
+        // On met le fragment des produits suivi par défaut
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new FollowedProductsView())
                 .commit();
 
+        // Gestion du changement de fragment
         BottomNavigationView navigationView = findViewById(R.id.bottomNavigationView);
         navigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -108,11 +110,28 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
         });
     }
 
+    // Fonction qui met à jour la toolbar selon le language
+    private void UpdateToolbarText() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        TextView toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
+        toolbarTitle.setText(Utils.getResourceString(getApplicationContext(), R.string.app_name));
+        TextView toolbarSubtitle = toolbar.findViewById(R.id.toolbar_subtitle);
+        toolbarSubtitle.setText(Utils.getResourceString(getApplicationContext(), R.string.trouvez_les_articles_en_demande));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        UpdateToolbarText();
+    }
+
+    // Ouvre les paramètres de l'application
     private void Settings(View view) {
         Intent intent = new Intent(this, Settings.class);
         Utils.OpenSettings(this, getApplicationContext(), preferences, intent);
     }
 
+    // Validation des permissions du menu option
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -126,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
         }
     }
 
+    // Lancement de la modification d'un produit
     @Override
     public void TriggerEdit(int editID) {
         Fragment fragment = new AddProductView(editID);
@@ -134,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
                 .commit();
     }
 
+    // Finition de la modification d'un produit
     @Override
     public void EditDone() {
         Fragment fragment = new FollowedProductsView();
@@ -142,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
                 .commit();
     }
 
+    // Ouverture d'un lien
     @Override
     public void OpenLink(String link) {
         if(link.equals("")) return;
@@ -150,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements OnProductInteract
         startActivity(intent);
     }
 
+    // Montrer les données d'un produit
     @Override
     public void SeeChart(int ID) {
         Intent intent = new Intent(this, ChartData.class);

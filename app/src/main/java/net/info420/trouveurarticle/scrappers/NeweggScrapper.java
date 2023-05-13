@@ -3,12 +3,16 @@ package net.info420.trouveurarticle.scrappers;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+// Classe qui gère l'obtient de données sur newegg
 public class NeweggScrapper extends Scrapper{
     public static final String StoreName = "newegg.ca";
     public static final String SearchLinkStart = "https://www.newegg.ca/p/pl?d=";
+    // Fonction qui crée un lien de recherche newegg
     public static String SearchLink(String toSearch) {
         return SearchLinkStart + toSearch.replace(" ", "+");
     }
+
+    // Fonction qui nettoie un lien newegg
     public static String LinkCleaner(String link) {
         if(link == null || link.equals("")) return null;
         int lastIndex = link.lastIndexOf("?");
@@ -18,6 +22,8 @@ public class NeweggScrapper extends Scrapper{
             return link;
         }
     }
+
+    // Fonction qui obtient les informations du produit sur newegg
     @Override
     public ScrapperResult Fetch(Document document) {
         boolean isInStock = false;
@@ -50,6 +56,7 @@ public class NeweggScrapper extends Scrapper{
         return new ScrapperResult(isInStock, price);
     }
 
+    // Fonction qui obtient le nom du produit
     @Override
     public String FetchProductName(Document document) {
         Element productNameElement = document.selectFirst(".product-title");

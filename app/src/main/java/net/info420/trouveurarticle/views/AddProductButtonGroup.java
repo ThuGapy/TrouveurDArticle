@@ -26,33 +26,41 @@ import net.info420.trouveurarticle.scrappers.MemoryExpressScrapper;
 import net.info420.trouveurarticle.scrappers.NeweggScrapper;
 import net.info420.trouveurarticle.scrappers.StoreFront;
 
+// Classe qui représente un groupe de bouton pour l'ajout d'un produit
 public class AddProductButtonGroup extends LinearLayout {
+    // Déclaration des données membres
     private EditText editText;
     private ImageButton clearButton;
     private ImageButton searchButton;
     private StoreFront store;
 
+    // Constructeur de la classe à un argument
     public AddProductButtonGroup(Context context) {
         super(context);
         init(context);
     }
 
+    // Constructeur de la classe à deux argument
     public AddProductButtonGroup(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
+    // Constructeur de la classe à trois argument
     public AddProductButtonGroup(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
+    // Lorsque la vue est initialiser
     private void init(Context context) {
+        // On crée la vue et on obtient certains éléments
         LayoutInflater.from(context).inflate(R.layout.add_product_button_group, this, true);
         editText = findViewById(R.id.product_link);
         clearButton = findViewById(R.id.product_clear_button);
         searchButton = findViewById(R.id.product_search_button);
 
+        // On initialise l'écouteur de click pour le bouton vider
         clearButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,13 +68,14 @@ public class AddProductButtonGroup extends LinearLayout {
             }
         });
 
+        // On initialise l'écouteur de click pour le bouton de recherche
         searchButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(store == null) {
                     return;
                 }
-
+                // On obtient la boutique et le lien de recherche
                 ViewGroup parent = (ViewGroup) getParent();
                 EditText productNameText = parent.findViewById(R.id.product_name_edit);
 
@@ -101,6 +110,7 @@ public class AddProductButtonGroup extends LinearLayout {
                         break;
                 }
 
+                // Si le lien de recherche n'est pas vide, on ouvre un navigateur dans l'application
                 if(!link.equals("")) {
                     View popupView = LayoutInflater.from(context).inflate(R.layout.easy_search_popup, null);
                     PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -120,6 +130,8 @@ public class AddProductButtonGroup extends LinearLayout {
                     });
 
                     Button validateButton = popupView.findViewById(R.id.submit_button);
+
+                    // Initialisation de l'écouteur de click du bouton valider pour valider la sélection du produit
                     validateButton.setOnClickListener(new OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -169,18 +181,12 @@ public class AddProductButtonGroup extends LinearLayout {
         return editText;
     }
 
-    public ImageButton getClearButton() {
-        return clearButton;
-    }
-
-    public ImageButton getSearchButton() {
-        return searchButton;
-    }
 
     public void ClearTextBox() {
         editText.setText("");
     }
 
+    // Client web qui s'ouvre directement dans notre application
     private class EasySearchWebClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {

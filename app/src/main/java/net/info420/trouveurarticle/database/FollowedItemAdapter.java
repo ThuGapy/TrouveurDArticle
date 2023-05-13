@@ -21,7 +21,9 @@ import net.info420.trouveurarticle.Utils;
 import net.info420.trouveurarticle.views.OnRefreshRequestedListener;
 import net.info420.trouveurarticle.views.OnProductInteractionListener;
 
+// Adapter qui gère les produits dans le menu principal
 public class FollowedItemAdapter extends CursorAdapter {
+    // Déclaration des données membres
     private Context applicationContext;
     private DatabaseHelper dbHelper;
     private ListView adapterListView;
@@ -29,6 +31,7 @@ public class FollowedItemAdapter extends CursorAdapter {
     private OnRefreshRequestedListener fragmentRefreshListener;
     private CursorWrapper wrapper;
 
+    // Constructeur de la classe
     public FollowedItemAdapter(Context context, CursorWrapper _wrapper, OnProductInteractionListener editListener, OnRefreshRequestedListener refreshListener) {
         super(context, null, 0);
         wrapper = _wrapper;
@@ -38,6 +41,7 @@ public class FollowedItemAdapter extends CursorAdapter {
         changeCursor(wrapper.cursor);
     }
 
+    // Création de la vue
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -47,8 +51,10 @@ public class FollowedItemAdapter extends CursorAdapter {
         return view;
     }
 
+    // Liaison de la vue
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
+        // Obtention des index des colonnes à partir du curseur
         int idIndex = cursor.getColumnIndexOrThrow("_id");
         int nomArticleIndex = cursor.getColumnIndexOrThrow("nomArticle");
         int prixIndex = cursor.getColumnIndexOrThrow("prix");
@@ -65,12 +71,15 @@ public class FollowedItemAdapter extends CursorAdapter {
         int memoryExpressStockIndex = cursor.getColumnIndexOrThrow("memoryexpress_stock");
         int memoryExpressPriceIndex = cursor.getColumnIndexOrThrow("memoryexpress_price");
 
+        // Obtention des informations sur le produit
         int elementID = cursor.getInt(idIndex);
         String elementName = cursor.getString(nomArticleIndex);
 
         View colorIndicatorView = view.findViewById(R.id.color_indicator);
         TextView itemName = view.findViewById(R.id.item_name);
 
+
+        // Initialisation des écouteurs de click sur les boutons
         ImageButton seeButton = view.findViewById(R.id.see_button);
         seeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,6 +101,7 @@ public class FollowedItemAdapter extends CursorAdapter {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Message de validation de suppression
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage(String.format(Utils.getResourceString(context, R.string.etes_vous_certain_de_vouloir_supprimer_le_produit), elementName));
                 builder.setTitle(Utils.getResourceString(context, R.string.confirmation));
@@ -118,6 +128,7 @@ public class FollowedItemAdapter extends CursorAdapter {
             }
         });
 
+        // Détermination du status de l'article pour chaque boutique
         PriceStatus status = PriceStatus.NO_DATA;
         boolean inStock = false;
         double price = -1;
@@ -150,6 +161,7 @@ public class FollowedItemAdapter extends CursorAdapter {
             }
         }
 
+        // Détermination du status de l'article (couleur)
         float targetPrice = cursor.getFloat(prixIndex);
 
         if(inStock && price <= targetPrice) {
@@ -164,6 +176,7 @@ public class FollowedItemAdapter extends CursorAdapter {
 
         itemName.setText(cursor.getString(nomArticleIndex));
 
+        // Changement de la couleur de l'indicateur selon le status
         switch(status) {
             case GOOD:
                 colorIndicatorView.setBackgroundColor(ContextCompat.getColor(context, R.color.instock_color));
@@ -181,6 +194,7 @@ public class FollowedItemAdapter extends CursorAdapter {
 
         TextView productPrice = view.findViewById(R.id.price_text);
 
+        // Changement de la couleur du texte et redirection vers un lien si l'article est en stock
         if(status == PriceStatus.GOOD || status == PriceStatus.OVERPRICED) {
             String seeLink = lowestPriceLink;
             itemName.setOnClickListener(new View.OnClickListener() {
@@ -201,6 +215,7 @@ public class FollowedItemAdapter extends CursorAdapter {
         }
     }
 
+    // Finalisation de la vue
     @Override
     protected void finalize() throws Throwable {
         try {
